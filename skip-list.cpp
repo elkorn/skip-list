@@ -11,7 +11,7 @@ class SkipList {
     };
 
     private:
-    const int _maxLevel;
+        const int _maxLevel;
     SkipListNode _head;
 
     public:
