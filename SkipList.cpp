@@ -1,5 +1,4 @@
 #include <iostream>
-#include <fstream>
 #include "SkipListNode.h"
 #include "RandomHeight.h"
 
@@ -12,7 +11,7 @@ class SkipList {
         bool insert(Key*, Val*);
         bool remove(Key*);
         Val* retrieve(Key*);
-        void print(std::ofstream &);
+        void print(std::ostream &);
 
     private:
         SkipListNode<Key, Val>* head;
@@ -24,14 +23,14 @@ class SkipList {
 };
 
 template <class Key, class Val>
-SkipList<Key, Val>::SkipList(float theProbability, int theMaxHeight, Key* theKey) {
+SkipList<Key, Val>::SkipList(float theProbability, int theMaxHeight, Key* maxKey) {
     currentHeight = 1;
     maxHeight = theMaxHeight;
     probability = theProbability;
     randomizer = new RandomHeight(theMaxHeight, theProbability);
 
     head = new SkipListNode<Key, Val>(theMaxHeight);
-    tail = new SkipListNode<Key, Val>(theKey, (Val*)nullptr, theMaxHeight);
+    tail = new SkipListNode<Key, Val>(maxKey, (Val*)nullptr, theMaxHeight);
     for (int i = 1; i <= theMaxHeight; ++i) head->next[i] = tail;
 }
 
@@ -156,7 +155,7 @@ Val* SkipList<Key, Val>::retrieve(Key* theKey) {
 }
 
 template <class Key, class Val>
-void SkipList<Key, Val>::print(std::ofstream& out) {
+void SkipList<Key, Val>::print(std::ostream &out) {
     SkipListNode<Key, Val> *tempNode = head;
 
     while(tempNode != tail) {
