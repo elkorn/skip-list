@@ -156,6 +156,23 @@ Val* SkipList<Key, Val>::retrieve(Key* theKey) {
 }
 
 template <class Key, class Val>
+void SkipList<Key, Val>::print(std::ofstream& out) {
+    SkipListNode<Key, Val> *tempNode = head;
+
+    while(tempNode != tail) {
+        if(tempNode == head) {
+            out << "HEAD";
+        } else {
+            out << tempNode->getKey();
+        }
+
+        out << std::endl << std::flush;
+    }
+
+    out << "TAIL" << std::endl << std::flush;
+}
+
+template <class Key, class Val>
 SkipList<Key, Val>::~SkipList() {
     SkipListNode<Key, Val> *tempNode = head, *nextNode;
     while(tempNode) {
