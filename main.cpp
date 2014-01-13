@@ -9,5 +9,6 @@ int main(int argc, char** argv) {
     SkipList<string, int> *theList = new SkipList<string, int>((float).6, 5, &maxKey);
 
     theList->print(cout);
+
     return 0;
 }
