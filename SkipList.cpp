@@ -89,6 +89,7 @@ bool SkipList<Key, Val>::remove(Key* theKey) {
     SkipListNode<Key,Val>* tempNode = head;
     Key* compareKey;
 
+    // TODO: extract this to a common private function.
     for (int h = currentHeight; h > 0; --h) {
         compareKey = tempNode->next[h]->getKey();
         while(*compareKey < *theKey) {
@@ -124,6 +125,34 @@ bool SkipList<Key, Val>::remove(Key* theKey) {
 
     // Node not found - nothing to remove.
     return false;
+}
+
+template <class Key, class Val>
+Val* SkipList<Key, Val>::retrieve(Key* theKey) {
+    int h = currentHeight;
+    SkipListNode<Key, Val> **toUpdate = new SkipListNode<Key, Val>*[maxHeight+1];
+    SkipListNode<Key, Val>* tempNode = head;
+    Key* compareKey;
+
+    for (; h > 0; --h) {
+        compareKey = tempNode->next[h]->getKey();
+        while(*compareKey < *theKey) {
+            tempNode = tempNode->next[h];
+            compareKey = tempNode->getKey();
+        }
+
+        toUpdate[h] = tempNode;
+    }
+
+    tempNode = tempNode->next[1];
+    compareKey = tempNode->getKey();
+
+    if (*compareKey == *theKey) {
+        // Success!
+        return tempNode->getVal();
+    }
+
+    return (SkipListNode<Key, Val>*)nullptr;
 }
 
 template <class Key, class Val>
