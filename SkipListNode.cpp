@@ -6,16 +6,16 @@ SkipListNode<Key, Val>::SkipListNode(Key* theKey, Val* theVal, int theHeight) {
     key = theKey;
     value = theVal;
     next = new SkipListNode<Key, Val>* [nodeHeight+1];
-    for(int x = 1; x <= nodeHeight; ++x) next[x] = (SkipListNode<Key, Val>*)nullptr;
+    for(int x = 1; x <= nodeHeight; ++x) next[x] = (SkipListNode<Key, Val>*)0;
 }
 
 template <class Key, class Val>
 SkipListNode<Key, Val>::SkipListNode(int theHeight):
     nodeHeight(theHeight),
-    key((Key*)nullptr),
-    value((Val*)nullptr) {
+    key((Key*)0),
+    value((Val*)0) {
     next = new SkipListNode<Key, Val>*[theHeight+1];
-    for(int x = 1; x <= nodeHeight; ++x) next[x] = (SkipListNode<Key, Val>*)nullptr;
+    for(int x = 1; x <= nodeHeight; ++x) next[x] = (SkipListNode<Key, Val>*)0;
 }
 
 template <class Key, class Val>

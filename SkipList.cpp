@@ -1,6 +1,6 @@
 #include <iostream>
-#include "SkipListNode.h"
-#include "RandomHeight.h"
+#include "SkipListNode.cpp"
+#include "RandomHeight.cpp"
 
 template <class Key, class Val>
 class SkipList {
@@ -30,7 +30,7 @@ SkipList<Key, Val>::SkipList(float theProbability, int theMaxHeight, Key* maxKey
     randomizer = new RandomHeight(theMaxHeight, theProbability);
 
     head = new SkipListNode<Key, Val>(theMaxHeight);
-    tail = new SkipListNode<Key, Val>(maxKey, (Val*)nullptr, theMaxHeight);
+    tail = new SkipListNode<Key, Val>(maxKey, (Val*)0, theMaxHeight);
     for (int i = 1; i <= theMaxHeight; ++i) head->next[i] = tail;
 }
 
@@ -43,7 +43,7 @@ bool SkipList<Key, Val>::insert(Key* theKey, Val* theValue) {
     // Check all the height levels for where to insert the new node.
     for(; h > 0; --h) {
         compareKey = tempNode->next[h]->getKey();
-        while(*compareKey < * *theKey) {
+        while(*compareKey < *theKey) {
             // We have to go further.
             tempNode = tempNode->next[h];
             compareKey = tempNode->next[h]->getKey();
@@ -151,7 +151,7 @@ Val* SkipList<Key, Val>::retrieve(Key* theKey) {
         return tempNode->getVal();
     }
 
-    return (SkipListNode<Key, Val>*)nullptr;
+    return (SkipListNode<Key, Val>*)0;
 }
 
 template <class Key, class Val>
@@ -166,6 +166,7 @@ void SkipList<Key, Val>::print(std::ostream &out) {
         }
 
         out << std::endl << std::flush;
+        tempNode = tempNode->next[1];
     }
 
     out << "TAIL" << std::endl << std::flush;
