@@ -5,12 +5,13 @@
 template <class Key, class Val>
 class SkipList {
     public:
-        SkipList(float, int, Key*);
+        SkipList(float, int, const Key&);
+        SkipList();
         ~SkipList();
 
-        bool insert(Key*, Val*);
-        bool remove(Key*);
-        Val* retrieve(Key*);
+        bool insert(const Key&, Val*);
+        bool remove(const Key);
+        const Val* find(const Key&);
         void print(std::ostream &);
 
     private:
@@ -23,7 +24,16 @@ class SkipList {
 };
 
 template <class Key, class Val>
-SkipList<Key, Val>::SkipList(float theProbability, int theMaxHeight, Key* maxKey) {
+SkipList<Key, Val>::SkipList(): head(15), currentHeight(1) {
+
+    tail = 0;
+    for(int i = 0; i < maxHeight; ++i) {
+        head->next[i] = 0;
+    }
+}
+
+template <class Key, class Val>
+SkipList<Key, Val>::SkipList(float theProbability, int theMaxHeight, const Key &maxKey) {
     currentHeight = 1;
     maxHeight = theMaxHeight;
     probability = theProbability;
@@ -31,32 +41,26 @@ SkipList<Key, Val>::SkipList(float theProbability, int theMaxHeight, Key* maxKey
 
     head = new SkipListNode<Key, Val>(theMaxHeight);
     tail = new SkipListNode<Key, Val>(maxKey, (Val*)0, theMaxHeight);
-    for (int i = 1; i <= theMaxHeight; ++i) head->next[i] = tail;
+    for (int i = 0; i < theMaxHeight; ++i) head->next[i] = tail;
 }
 
 template <class Key, class Val>
-bool SkipList<Key, Val>::insert(Key* theKey, Val* theValue) {
-    int level = 0, h = currentHeight;
-    SkipListNode<Key, Val>** toUpdate = new SkipListNode<Key, Val>*[maxHeight+1];
+bool SkipList<Key, Val>::insert(const Key &theKey, Val* theValue) {
+    int level = 0, h = currentHeight - 1;
+    SkipListNode<Key, Val>** toUpdate = new SkipListNode<Key, Val>*[maxHeight];
     SkipListNode<Key, Val>* tempNode = head;
-    Key* compareKey;
+
     // Check all the height levels for where to insert the new node.
-    for(; h > 0; --h) {
-        compareKey = tempNode->next[h]->getKey();
-        while(*compareKey < *theKey) {
-            // We have to go further.
+    for (; h >= 0; --h) {
+        while (tempNode->next[h] != tail && tempNode->next[h]->getKey() < theKey) {
             tempNode = tempNode->next[h];
-            compareKey = tempNode->next[h]->getKey();
         }
 
-        // This node at level h will have to be updated after inserting the new one.
+        // This node will have to be updated at level h after inserting the new one.
         toUpdate[h] = tempNode;
     }
 
-    tempNode = tempNode->next[1];
-    compareKey = tempNode->getKey();
-
-    if(*compareKey == *theKey) {
+    if(tempNode->getKey() == theKey) {
         // We already have this key in the set - cannot insert.
         return false;
     }
@@ -66,14 +70,14 @@ bool SkipList<Key, Val>::insert(Key* theKey, Val* theValue) {
     if(level > currentHeight) {
         // Create all the levels between the previous and new currentHeight
         // and add them to the update matrix.
-        for(int i = currentHeight + 1; i <= level; ++i) toUpdate[i] = head; // The default lookup node.
+        for(int i = currentHeight; i < level; ++i) toUpdate[i] = head; // The default lookup node.
         currentHeight = level;
     }
 
     tempNode = new SkipListNode<Key, Val>(theKey, theValue, level);
 
     // Actually insert the node where it belongs.
-    for (int i = 1; i <= level; ++i) {
+    for (int i = 0; i < level; ++i) {
         tempNode->next[i] = toUpdate[i]->next[i];
         toUpdate[i]->next[i] = tempNode;
     }
@@ -83,27 +87,29 @@ bool SkipList<Key, Val>::insert(Key* theKey, Val* theValue) {
 }
 
 template <class Key, class Val>
-bool SkipList<Key, Val>::remove(Key* theKey) {
+bool SkipList<Key, Val>::remove(const Key theKey) {
     SkipListNode<Key, Val>** toUpdate = new SkipListNode<Key, Val>*[maxHeight+1];
     SkipListNode<Key,Val>* tempNode = head;
-    Key* compareKey;
+    Key compareKey;
 
     // TODO: extract this to a common private function.
-    for (int h = currentHeight; h > 0; --h) {
-        compareKey = tempNode->next[h]->getKey();
-        while(*compareKey < *theKey) {
-            tempNode = tempNode->next[h];
+    for (int h = currentHeight - 1; h >= 0; --h) {
+        if(tempNode->next[h] != tail) {
             compareKey = tempNode->next[h]->getKey();
+            while(compareKey < theKey) {
+                tempNode = tempNode->next[h];
+                compareKey = tempNode->next[h]->getKey();
+            }
         }
 
         toUpdate[h] = tempNode;
     }
 
     // Get the found node at the base level.
-    tempNode = tempNode->next[1];
+    tempNode = tempNode->next[0];
     compareKey = tempNode->getKey();
 
-    if (*compareKey == *theKey) {
+    if (compareKey == theKey) {
         for (int i = 1; i <= currentHeight; ++i) {
             if (toUpdate[i]->next[i] != tempNode) break; // The removed node does not exist at this level.
             toUpdate[i]->next[i] = tempNode->next[i]; // Wire up the pointers.
@@ -127,31 +133,27 @@ bool SkipList<Key, Val>::remove(Key* theKey) {
 }
 
 template <class Key, class Val>
-Val* SkipList<Key, Val>::retrieve(Key* theKey) {
-    int h = currentHeight;
-    SkipListNode<Key, Val> **toUpdate = new SkipListNode<Key, Val>*[maxHeight+1];
+const Val* SkipList<Key, Val>::find(const Key &theKey) {
+    int h = currentHeight - 1;
+    // SkipListNode<Key, Val> **toUpdate = new SkipListNode<Key, Val>*[maxHeight+1];
     SkipListNode<Key, Val>* tempNode = head;
-    Key* compareKey;
 
-    for (; h > 0; --h) {
-        compareKey = tempNode->next[h]->getKey();
-        while(*compareKey < *theKey) {
+    for (; h >= 0; --h) {
+        while (tempNode->next[h] != tail && tempNode->next[h]->getKey() < theKey) {
             tempNode = tempNode->next[h];
-            compareKey = tempNode->getKey();
         }
-
-        toUpdate[h] = tempNode;
     }
 
-    tempNode = tempNode->next[1];
-    compareKey = tempNode->getKey();
 
-    if (*compareKey == *theKey) {
+
+    tempNode = tempNode->next[0];
+
+    if (tempNode->getKey() == theKey) {
         // Success!
         return tempNode->getVal();
     }
 
-    return (SkipListNode<Key, Val>*)0;
+    return 0;
 }
 
 template <class Key, class Val>
@@ -166,7 +168,7 @@ void SkipList<Key, Val>::print(std::ostream &out) {
         }
 
         out << std::endl << std::flush;
-        tempNode = tempNode->next[1];
+        tempNode = tempNode->next[0];
     }
 
     out << "TAIL" << std::endl << std::flush;
@@ -176,7 +178,7 @@ template <class Key, class Val>
 SkipList<Key, Val>::~SkipList() {
     SkipListNode<Key, Val> *tempNode = head, *nextNode;
     while(tempNode) {
-        nextNode = tempNode->next[1];
+        nextNode = tempNode->next[0];
         delete tempNode;
         tempNode = nextNode;
     }

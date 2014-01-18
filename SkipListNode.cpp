@@ -1,7 +1,27 @@
-#include "SkipListNode.h"
+template <class Key, class Val>
+class SkipList;
 
 template <class Key, class Val>
-SkipListNode<Key, Val>::SkipListNode(Key* theKey, Val* theVal, int theHeight) {
+class SkipListNode {
+    public:
+        SkipListNode(const Key&, Val*, int);
+        // Creates an empty node.
+        SkipListNode(int);
+        ~SkipListNode();
+
+        const Key& getKey();
+        const Val* getVal();
+        int getHeight();
+        SkipListNode** next;
+
+    private:
+        int nodeHeight;
+        Key key;
+        Val* value;
+};
+
+template <class Key, class Val>
+SkipListNode<Key, Val>::SkipListNode(const Key &theKey, Val* theVal, int theHeight) {
     nodeHeight = theHeight;
     key = theKey;
     value = theVal;
@@ -12,19 +32,19 @@ SkipListNode<Key, Val>::SkipListNode(Key* theKey, Val* theVal, int theHeight) {
 template <class Key, class Val>
 SkipListNode<Key, Val>::SkipListNode(int theHeight):
     nodeHeight(theHeight),
-    key((Key*)0),
+    key(Key()),
     value((Val*)0) {
-    next = new SkipListNode<Key, Val>*[theHeight+1];
+    next = new SkipListNode<Key, Val>* [theHeight+1];
     for(int x = 1; x <= nodeHeight; ++x) next[x] = (SkipListNode<Key, Val>*)0;
 }
 
 template <class Key, class Val>
-Key* SkipListNode<Key, Val>::getKey() {
+const Key& SkipListNode<Key, Val>::getKey() {
     return key;
 }
 
 template <class Key, class Val>
-Val* SkipListNode<Key, Val>::getVal() {
+const Val* SkipListNode<Key, Val>::getVal() {
     return value;
 }
 
