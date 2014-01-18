@@ -13,11 +13,11 @@ int main(int argc, char** argv) {
     theList->insert("c", &testVal1);
     theList->print(cout);
 
-    cout << *theList->find("c");
-
-    // theList->remove("c");
-    // theList->insert(&testKey3, &testVal3);
-
-
+    cout << theList->find("c");
+    try {
+        cout << theList->find("xxyzzyxx");
+    } catch(ElementNotFoundException<string> &ex) {
+        cout << ex.what();
+    }
     return 0;
 }

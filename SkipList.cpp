@@ -1,6 +1,7 @@
 #include <iostream>
 #include "SkipListNode.cpp"
 #include "RandomHeight.cpp"
+#include "ElementNotFoundException.cpp"
 
 template <class Key, class Val>
 class SkipList {
@@ -11,7 +12,7 @@ class SkipList {
 
         bool insert(const Key&, Val*);
         bool remove(const Key);
-        const Val* find(const Key&);
+        const Val& find(const Key&);
         void print(std::ostream &);
 
     private:
@@ -133,7 +134,7 @@ bool SkipList<Key, Val>::remove(const Key theKey) {
 }
 
 template <class Key, class Val>
-const Val* SkipList<Key, Val>::find(const Key &theKey) {
+const Val& SkipList<Key, Val>::find(const Key &theKey) {
     int h = currentHeight - 1;
     // SkipListNode<Key, Val> **toUpdate = new SkipListNode<Key, Val>*[maxHeight+1];
     SkipListNode<Key, Val>* tempNode = head;
@@ -153,7 +154,7 @@ const Val* SkipList<Key, Val>::find(const Key &theKey) {
         return tempNode->getVal();
     }
 
-    return 0;
+    throw ElementNotFoundException<Key>(theKey);
 }
 
 template <class Key, class Val>

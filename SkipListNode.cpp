@@ -10,7 +10,7 @@ class SkipListNode {
         ~SkipListNode();
 
         const Key& getKey();
-        const Val* getVal();
+        const Val& getVal();
         int getHeight();
         SkipListNode** next;
 
@@ -44,8 +44,8 @@ const Key& SkipListNode<Key, Val>::getKey() {
 }
 
 template <class Key, class Val>
-const Val* SkipListNode<Key, Val>::getVal() {
-    return value;
+const Val& SkipListNode<Key, Val>::getVal() {
+    return *value;
 }
 
 
