@@ -14,6 +14,7 @@ class SkipList {
         bool remove(const Key);
         const Val& find(const Key&);
         void print(std::ostream &);
+        const bool empty();
 
     private:
         SkipListNode<Key, Val>* head;
@@ -25,11 +26,12 @@ class SkipList {
 };
 
 template <class Key, class Val>
-SkipList<Key, Val>::SkipList(): head(15), currentHeight(1) {
-
+SkipList<Key, Val>::SkipList():  currentHeight(1) {
+    maxHeight = 15;
+    head = new SkipListNode<Key, Val>(maxHeight);
     tail = 0;
     for(int i = 0; i < maxHeight; ++i) {
-        head->next[i] = 0;
+        head->next[i] = tail;
     }
 }
 
@@ -136,7 +138,6 @@ bool SkipList<Key, Val>::remove(const Key theKey) {
 template <class Key, class Val>
 const Val& SkipList<Key, Val>::find(const Key &theKey) {
     int h = currentHeight - 1;
-    // SkipListNode<Key, Val> **toUpdate = new SkipListNode<Key, Val>*[maxHeight+1];
     SkipListNode<Key, Val>* tempNode = head;
 
     for (; h >= 0; --h) {
@@ -173,6 +174,11 @@ void SkipList<Key, Val>::print(std::ostream &out) {
     }
 
     out << "TAIL" << std::endl << std::flush;
+}
+
+template <class Key, class Val>
+const bool SkipList<Key, Val>::empty() {
+    return head->next[0] == tail;
 }
 
 template <class Key, class Val>

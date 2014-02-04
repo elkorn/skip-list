@@ -21,7 +21,12 @@ int main(int argc, char** argv) {
     }
 
     theList->insert("b", &testVal3);
-
+    cout << endl;
     theList->print(cout);
+
+    SkipList<string, string> *emptyList = new SkipList<string, string>();
+
+    cout << "For an empty set: " << emptyList->empty() << ", for a non-empty set: " << theList->empty();
+
     return 0;
 }
