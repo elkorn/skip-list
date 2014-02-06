@@ -15,6 +15,7 @@ class SkipList {
         const Val& find(const Key&);
         void print(std::ostream &);
         const bool empty();
+        const unsigned int count(const Key&);
         const unsigned int size();
 
     private:
@@ -146,6 +147,10 @@ const Val& SkipList<Key, Val>::find(const Key &theKey) {
     int h = currentHeight - 1;
     SkipListNode<Key, Val>* tempNode = head;
 
+    if (empty()) {
+        throw ElementNotFoundException<Key>(theKey);
+    }
+
     for (; h >= 0; --h) {
         while (tempNode->next[h] != tail && tempNode->next[h]->getKey() < theKey) {
             tempNode = tempNode->next[h];
@@ -192,6 +197,16 @@ const unsigned int SkipList<Key, Val>::size() {
     // To keep the size operation at O(1), the size is being maintained 
     // throughout the lifetime of the list.
     return _size;
+}
+
+template <class Key, class Val>
+const unsigned int SkipList<Key, Val>::count(const Key& theKey) {
+    try {
+        find(theKey);
+        return 1;
+    } catch(ElementNotFoundException<Key>& e) {
+        return 0;
+    }
 }
 
 template <class Key, class Val>

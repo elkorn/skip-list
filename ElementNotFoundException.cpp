@@ -14,5 +14,5 @@ class ElementNotFoundException: public exception {
         }
 
     private:
-            Key key;
+            const Key &key;
 };

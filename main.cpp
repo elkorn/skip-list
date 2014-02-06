@@ -30,5 +30,8 @@ int main(int argc, char** argv) {
     assert(theList->empty() == 0);
     assert(theList->size() == 3);
     assert(emptyList->size() == 0);
+    assert(theList->count("c") == 1);
+    assert(theList->count("z") == 0);
+    assert(emptyList->count("c") == 0);
     return 0;
 }
