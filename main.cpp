@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <string.h>
 #include <iostream>
 #include "SkipList.cpp"
@@ -9,6 +10,7 @@ int main(int argc, char** argv) {
     string testKey1 = "a", testKey2 = "c", testKey3 = "dddd";
     int testVal1 = 12, testVal2 = 1238, testVal3 = 124546;
     SkipList<string, int> *theList = new SkipList<string, int>((float).6, 5, maxKey);
+    SkipList<string, string> *emptyList = new SkipList<string, string>();
     theList->insert("a", &testVal1);
     theList->insert("c", &testVal2);
     theList->print(cout);
@@ -24,9 +26,9 @@ int main(int argc, char** argv) {
     cout << endl;
     theList->print(cout);
 
-    SkipList<string, string> *emptyList = new SkipList<string, string>();
-
-    cout << "For an empty set: " << emptyList->empty() << ", for a non-empty set: " << theList->empty();
-
+    assert(emptyList->empty() == 1);
+    assert(theList->empty() == 0);
+    assert(theList->size() == 3);
+    assert(emptyList->size() == 0);
     return 0;
 }

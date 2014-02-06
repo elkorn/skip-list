@@ -15,6 +15,7 @@ class SkipList {
         const Val& find(const Key&);
         void print(std::ostream &);
         const bool empty();
+        const unsigned int size();
 
     private:
         SkipListNode<Key, Val>* head;
@@ -22,6 +23,7 @@ class SkipList {
         float probability;
         int maxHeight;
         int currentHeight;
+        unsigned int _size;
         RandomHeight* randomizer;
 };
 
@@ -85,6 +87,8 @@ bool SkipList<Key, Val>::insert(const Key &theKey, Val* theValue) {
         toUpdate[i]->next[i] = tempNode;
     }
 
+    ++_size;
+
     // Success!
     return true;
 }
@@ -126,6 +130,8 @@ bool SkipList<Key, Val>::remove(const Key theKey) {
             // If there are no nodes at currentHeight, decrement the value - no need to poke around there.
             --currentHeight;
         }
+
+        --_size;
 
         // Success!
         return true;
@@ -179,6 +185,13 @@ void SkipList<Key, Val>::print(std::ostream &out) {
 template <class Key, class Val>
 const bool SkipList<Key, Val>::empty() {
     return head->next[0] == tail;
+}
+
+template <class Key, class Val>
+const unsigned int SkipList<Key, Val>::size() {
+    // To keep the size operation at O(1), the size is being maintained 
+    // throughout the lifetime of the list.
+    return _size;
 }
 
 template <class Key, class Val>
