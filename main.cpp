@@ -15,9 +15,9 @@ int main(int argc, char** argv) {
     theList->insert("c", &testVal2);
     theList->find("c"); // removing this causes a segfault.
     try {
-        cout << theList->find("xxyzzyxx");
+        theList->find("xxyzzyxx");
+        assert(false && "It should throw an exception when searching for a non-existent key.");
     } catch(ElementNotFoundException<string> &ex) {
-        cout << ex.what();
     }
 
     theList->insert("b", &testVal3);
@@ -34,10 +34,8 @@ int main(int argc, char** argv) {
     ++it;
     assert(*it == testVal3 && "After incrementing, the iterator should point to the value at key 'b'.");
     assert(*it == it->getVal() && "The `->` operator should return the element pointed at by the iterator.");
-    // TODO: This points out an obvious bug in `erase`. Fix it.
-    // cout <<  "It should erase the 'b' element.";
-    // theList->erase("b");
-    // assert(theList->size() == 2 && "It should erase the 'b' element.");
+    theList->erase("b");
+    assert(theList->size() == 2 && "It should erase the 'b' element.");
 
     return 0;
 }

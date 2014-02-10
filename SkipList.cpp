@@ -160,7 +160,7 @@ bool SkipList<Key, Val>::erase(const Key theKey) {
     compareKey = tempNode->getKey();
 
     if (compareKey == theKey) {
-        for (int i = 1; i <= currentHeight; ++i) {
+        for (int i = 0; i < currentHeight; ++i) {
             if (toUpdate[i]->next[i] != tempNode) break; // The erased node does not exist at this level.
             toUpdate[i]->next[i] = tempNode->next[i]; // Wire up the pointers.
         }
