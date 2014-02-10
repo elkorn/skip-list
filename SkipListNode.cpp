@@ -56,7 +56,6 @@ int SkipListNode<Key, Val>::getHeight() {
 
 template <class Key, class Val>
 SkipListNode<Key, Val>::~SkipListNode() {
-    delete key;
     delete value;
     delete []next;
 }

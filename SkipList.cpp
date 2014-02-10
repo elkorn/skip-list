@@ -11,12 +11,54 @@ class SkipList {
         ~SkipList();
 
         bool insert(const Key&, Val*);
-        bool remove(const Key);
+        bool erase(const Key);
         const Val& find(const Key&);
         void print(std::ostream &);
         const bool empty();
         const unsigned int count(const Key&);
         const unsigned int size();
+
+        struct iterator {
+            typedef iterator self_type;
+            typedef SkipListNode<Key, Val> value_type;
+ 
+            iterator(value_type *start) {
+                current = start;
+            }
+
+            bool hasNext() {
+                return current->next[0] != 0 && current->next[0]->next[0] != 0;
+            }
+
+            self_type operator ++() {
+                self_type res = *this;
+                current = current->next[0];
+                return res;
+            }
+
+            const Val& operator *() {
+                return current->getVal();
+            }
+
+            value_type *operator ->() {
+                return current;
+            }
+
+            bool operator==(const self_type &other) {
+                return current == other.current;
+            }
+
+            bool operator!=(const self_type &other) {
+                return current != other.current;
+            }
+
+            private:
+                SkipListNode<Key, Val> *current;
+        };
+
+        iterator begin();
+        iterator end();
+
 
     private:
         SkipListNode<Key, Val>* head;
@@ -95,7 +137,7 @@ bool SkipList<Key, Val>::insert(const Key &theKey, Val* theValue) {
 }
 
 template <class Key, class Val>
-bool SkipList<Key, Val>::remove(const Key theKey) {
+bool SkipList<Key, Val>::erase(const Key theKey) {
     SkipListNode<Key, Val>** toUpdate = new SkipListNode<Key, Val>*[maxHeight+1];
     SkipListNode<Key,Val>* tempNode = head;
     Key compareKey;
@@ -119,7 +161,7 @@ bool SkipList<Key, Val>::remove(const Key theKey) {
 
     if (compareKey == theKey) {
         for (int i = 1; i <= currentHeight; ++i) {
-            if (toUpdate[i]->next[i] != tempNode) break; // The removed node does not exist at this level.
+            if (toUpdate[i]->next[i] != tempNode) break; // The erased node does not exist at this level.
             toUpdate[i]->next[i] = tempNode->next[i]; // Wire up the pointers.
         }
 
@@ -138,7 +180,7 @@ bool SkipList<Key, Val>::remove(const Key theKey) {
         return true;
     }
 
-    // Node not found - nothing to remove.
+    // Node not found - nothing to erase.
     return false;
 }
 
@@ -218,3 +260,14 @@ SkipList<Key, Val>::~SkipList() {
         tempNode = nextNode;
     }
 }
+
+template <class Key, class Val>
+typename SkipList<Key, Val>::iterator SkipList<Key, Val>::begin() {
+    return SkipList<Key, Val>::iterator(head->next[0]);
+}
+
+template <class Key, class Val>
+typename SkipList<Key, Val>::iterator SkipList<Key, Val>::end() {
+    return SkipList<Key, Val>::iterator(tail);
+}
+

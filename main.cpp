@@ -13,9 +13,7 @@ int main(int argc, char** argv) {
     SkipList<string, string> *emptyList = new SkipList<string, string>();
     theList->insert("a", &testVal1);
     theList->insert("c", &testVal2);
-    theList->print(cout);
-
-    cout << theList->find("c") << endl;
+    theList->find("c"); // removing this causes a segfault.
     try {
         cout << theList->find("xxyzzyxx");
     } catch(ElementNotFoundException<string> &ex) {
@@ -23,8 +21,6 @@ int main(int argc, char** argv) {
     }
 
     theList->insert("b", &testVal3);
-    cout << endl;
-    theList->print(cout);
 
     assert(emptyList->empty() == 1);
     assert(theList->empty() == 0);
@@ -33,5 +29,15 @@ int main(int argc, char** argv) {
     assert(theList->count("c") == 1);
     assert(theList->count("z") == 0);
     assert(emptyList->count("c") == 0);
+    SkipList<string, int>::iterator it = theList->begin();
+    assert(*it == testVal1 && "An iterator acquired through the `begin` method should point at the first value of the skiplist.");
+    ++it;
+    assert(*it == testVal3 && "After incrementing, the iterator should point to the value at key 'b'.");
+    assert(*it == it->getVal() && "The `->` operator should return the element pointed at by the iterator.");
+    // TODO: This points out an obvious bug in `erase`. Fix it.
+    // cout <<  "It should erase the 'b' element.";
+    // theList->erase("b");
+    // assert(theList->size() == 2 && "It should erase the 'b' element.");
+
     return 0;
 }
