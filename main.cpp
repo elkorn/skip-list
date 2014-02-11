@@ -17,11 +17,9 @@ int main(int argc, char** argv) {
     try {
         theList->find("xxyzzyxx");
         assert(false && "It should throw an exception when searching for a non-existent key.");
-    } catch(ElementNotFoundException<string> &ex) {
-    }
+    } catch(ElementNotFoundException<string> &ex) { }
 
     theList->insert("b", &testVal3);
-
     assert(emptyList->empty() == 1);
     assert(theList->empty() == 0);
     assert(theList->size() == 3);
@@ -29,13 +27,23 @@ int main(int argc, char** argv) {
     assert(theList->count("c") == 1);
     assert(theList->count("z") == 0);
     assert(emptyList->count("c") == 0);
+    theList->erase("b");
+    assert(theList->size() == 2 && "It should erase the 'b' element.");
+    theList->insert("b", &testVal3);
     SkipList<string, int>::iterator it = theList->begin();
     assert(*it == testVal1 && "An iterator acquired through the `begin` method should point at the first value of the skiplist.");
     ++it;
     assert(*it == testVal3 && "After incrementing, the iterator should point to the value at key 'b'.");
     assert(*it == it->getVal() && "The `->` operator should return the element pointed at by the iterator.");
-    theList->erase("b");
-    assert(theList->size() == 2 && "It should erase the 'b' element.");
+
+    assert(it->prev[0]->getVal() == testVal1 && "The previous element for the iterator at key 'b' should be that under the key 'a'.");
+    SkipList<string, int>::reverse_iterator rit = theList->rbegin();
+    assert(*rit == testVal2 && "A reverse iterator acquired through the `rbegin` method should point at the last value of the skiplist.");
+    ++rit;
+    assert(*rit == testVal3 && "After incrementing, the reverse iterator should point to the value at key 'b'.");
+    assert(*rit == rit->getVal() && "The `->` operator should return the element pointed at by the reverse iterator.");
+    ++rit;
+    assert(*rit == testVal1 && "After incrementing twice, the reverse iterator should point to the value at key 'a'.");
 
     return 0;
 }

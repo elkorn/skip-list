@@ -56,8 +56,48 @@ class SkipList {
                 SkipListNode<Key, Val> *current;
         };
 
+        struct reverse_iterator {
+            typedef reverse_iterator self_type;
+            typedef SkipListNode<Key, Val> value_type;
+
+            reverse_iterator(value_type *start) {
+                current = start;
+            }
+
+            bool hasNext() {
+                return current->prev[0] != 0 && current->prev[0]->prev[0] != 0;
+            }
+
+            self_type operator ++() {
+                self_type res = *this;
+                current = current->prev[0];
+                return res;
+            }
+
+            const Val& operator *() {
+                return current->getVal();
+            }
+
+            value_type *operator ->() {
+                return current;
+            }
+
+            bool operator==(const self_type &other) {
+                return current == other.current;
+            }
+
+            bool operator!=(const self_type &other) {
+                return current != other.current;
+            }
+
+            private:
+                SkipListNode<Key, Val> *current;
+        };
+
         iterator begin();
         iterator end();
+        reverse_iterator rbegin();
+        reverse_iterator rend();
 
 
     private:
@@ -110,6 +150,7 @@ bool SkipList<Key, Val>::insert(const Key &theKey, Val* theValue) {
 
     if(tempNode->getKey() == theKey) {
         // We already have this key in the set - cannot insert.
+        delete []toUpdate;
         return false;
     }
 
@@ -127,12 +168,15 @@ bool SkipList<Key, Val>::insert(const Key &theKey, Val* theValue) {
     // Actually insert the node where it belongs.
     for (int i = 0; i < level; ++i) {
         tempNode->next[i] = toUpdate[i]->next[i];
+        tempNode->prev[i] = toUpdate[i];
+        toUpdate[i]->next[i]->prev[i] = tempNode;
         toUpdate[i]->next[i] = tempNode;
     }
 
     ++_size;
 
     // Success!
+    delete[] toUpdate;
     return true;
 }
 
@@ -162,7 +206,9 @@ bool SkipList<Key, Val>::erase(const Key theKey) {
     if (compareKey == theKey) {
         for (int i = 0; i < currentHeight; ++i) {
             if (toUpdate[i]->next[i] != tempNode) break; // The erased node does not exist at this level.
-            toUpdate[i]->next[i] = tempNode->next[i]; // Wire up the pointers.
+            // Wire up the pointers.
+            toUpdate[i]->next[i] = tempNode->next[i];
+            tempNode->next[i]->prev[i] = toUpdate[i];
         }
 
         delete tempNode;
@@ -177,10 +223,12 @@ bool SkipList<Key, Val>::erase(const Key theKey) {
         --_size;
 
         // Success!
+        delete []toUpdate;
         return true;
     }
 
     // Node not found - nothing to erase.
+    delete []toUpdate;
     return false;
 }
 
@@ -271,3 +319,12 @@ typename SkipList<Key, Val>::iterator SkipList<Key, Val>::end() {
     return SkipList<Key, Val>::iterator(tail);
 }
 
+template <class Key, class Val>
+typename SkipList<Key, Val>::reverse_iterator SkipList<Key, Val>::rbegin() {
+    return SkipList<Key, Val>::reverse_iterator(tail->prev[0]);
+}
+
+template <class Key, class Val>
+typename SkipList<Key, Val>::reverse_iterator SkipList<Key, Val>::rend() {
+    return SkipList<Key, Val>::reverse_iterator(head);
+}
