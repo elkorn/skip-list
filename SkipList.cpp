@@ -1,118 +1,90 @@
 #include <iostream>
 #include "SkipListNode.cpp"
 #include "RandomHeight.cpp"
-#include "ElementNotFoundException.cpp"
-#include "LowerBoundNotFoundException.cpp"
-#include "UpperBoundNotFoundException.cpp"
+#include "SkipList.h"
 #include <utility>
 
+#include "exceptions/ElementNotFoundException.cpp"
+#include "exceptions/LowerBoundNotFoundException.cpp"
+#include "exceptions/UpperBoundNotFoundException.cpp"
+
+
 template <class Key, class Val>
-class SkipList {
-    public:
-        SkipList(float, int, const Key&);
-        SkipList();
-        ~SkipList();
+struct SkipList<Key, Val>::iterator {
+    typedef iterator self_type;
+    typedef SkipListNode<Key, Val> value_type;
 
-        bool insert(const Key&, Val*);
-        bool erase(const Key);
-        const Val& find(const Key&);
-        void print(std::ostream &);
-        const bool empty();
-        const unsigned int count(const Key&);
-        const unsigned int size();
+    iterator(value_type *start) {
+        current = start;
+    }
 
-        struct iterator {
-            typedef iterator self_type;
-            typedef SkipListNode<Key, Val> value_type;
+    bool hasNext() {
+        return current->next[0] != 0 && current->next[0]->next[0] != 0;
+    }
 
-            iterator(value_type *start) {
-                current = start;
-            }
+    self_type operator ++() {
+        self_type res = *this;
+        current = current->next[0];
+        return res;
+    }
 
-            bool hasNext() {
-                return current->next[0] != 0 && current->next[0]->next[0] != 0;
-            }
+    const Val& operator *() {
+        return current->getVal();
+    }
 
-            self_type operator ++() {
-                self_type res = *this;
-                current = current->next[0];
-                return res;
-            }
+    value_type *operator ->() {
+        return current;
+    }
 
-            const Val& operator *() {
-                return current->getVal();
-            }
+    bool operator==(const self_type &other) {
+        return current == other.current;
+    }
 
-            value_type *operator ->() {
-                return current;
-            }
-
-            bool operator==(const self_type &other) {
-                return current == other.current;
-            }
-
-            bool operator!=(const self_type &other) {
-                return current != other.current;
-            }
-
-            private:
-                SkipListNode<Key, Val> *current;
-        };
-
-        struct reverse_iterator {
-            typedef reverse_iterator self_type;
-            typedef SkipListNode<Key, Val> value_type;
-
-            reverse_iterator(value_type *start) {
-                current = start;
-            }
-
-            bool hasNext() {
-                return current->prev[0] != 0 && current->prev[0]->prev[0] != 0;
-            }
-
-            self_type operator ++() {
-                self_type res = *this;
-                current = current->prev[0];
-                return res;
-            }
-
-            const Val& operator *() {
-                return current->getVal();
-            }
-
-            value_type *operator ->() {
-                return current;
-            }
-
-            bool operator==(const self_type &other) {
-                return current == other.current;
-            }
-
-            bool operator!=(const self_type &other) {
-                return current != other.current;
-            }
-
-            private:
-                SkipListNode<Key, Val> *current;
-        };
-
-        iterator begin();
-        iterator end();
-        reverse_iterator rbegin();
-        reverse_iterator rend();
-        iterator lower_bound(const Key& theKey);
-        iterator upper_bound(const Key& theKey);
-        std::pair<iterator, iterator> equal_range(const Key& theKey);
+    bool operator!=(const self_type &other) {
+        return current != other.current;
+    }
 
     private:
-        SkipListNode<Key, Val>* head;
-        SkipListNode<Key, Val>* tail;
-        float probability;
-        int maxHeight;
-        int currentHeight;
-        unsigned int _size;
-        RandomHeight* randomizer;
+        SkipListNode<Key, Val> *current;
+};
+
+template<class Key, class Val>
+struct SkipList<Key,Val>::reverse_iterator {
+    typedef reverse_iterator self_type;
+    typedef SkipListNode<Key, Val> value_type;
+
+    reverse_iterator(value_type *start) {
+        current = start;
+    }
+
+    bool hasNext() {
+        return current->prev[0] != 0 && current->prev[0]->prev[0] != 0;
+    }
+
+    self_type operator ++() {
+        self_type res = *this;
+        current = current->prev[0];
+        return res;
+    }
+
+    const Val& operator *() {
+        return current->getVal();
+    }
+
+    value_type *operator ->() {
+        return current;
+    }
+
+    bool operator==(const self_type &other) {
+        return current == other.current;
+    }
+
+    bool operator!=(const self_type &other) {
+        return current != other.current;
+    }
+
+    private:
+        SkipListNode<Key, Val> *current;
 };
 
 template <class Key, class Val>
@@ -195,7 +167,8 @@ bool SkipList<Key, Val>::erase(const Key theKey) {
     for (int h = currentHeight - 1; h >= 0; --h) {
         if(tempNode->next[h] != tail) {
             compareKey = tempNode->next[h]->getKey();
-            while(compareKey < theKey) {
+            while(compareKey < theKey &&
+                    tempNode->next[h] != tail) {
                 tempNode = tempNode->next[h];
                 compareKey = tempNode->next[h]->getKey();
             }
@@ -220,7 +193,7 @@ bool SkipList<Key, Val>::erase(const Key theKey) {
 
         // Adjust currentHeight.
         while ((currentHeight > 1) &&
-            (head->next[currentHeight]->getKey() == tail->getKey())) {
+            (head->next[currentHeight-1]->getKey() == tail->getKey())) {
             // If there are no nodes at currentHeight, decrement the value - no need to poke around there.
             --currentHeight;
         }

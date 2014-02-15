@@ -6,5 +6,5 @@ class RandomHeight {
 
     private:
         int maxLevel;
-        int probability;
+        float probability;
 };
