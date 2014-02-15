@@ -4,7 +4,7 @@ class SkipList;
 template <class Key, class Val>
 class SkipListNode {
     public:
-        SkipListNode(const Key&, Val*, int);
+        SkipListNode(const Key&, Val&, int);
         // Creates an empty node.
         SkipListNode(int);
         ~SkipListNode();
@@ -22,10 +22,10 @@ class SkipListNode {
 };
 
 template <class Key, class Val>
-SkipListNode<Key, Val>::SkipListNode(const Key &theKey, Val* theVal, int theHeight) {
+SkipListNode<Key, Val>::SkipListNode(const Key &theKey, Val& theVal, int theHeight) {
     nodeHeight = theHeight;
     key = theKey;
-    value = theVal;
+    value = &theVal;
     next = new SkipListNode<Key, Val>* [nodeHeight+1];
     prev = new SkipListNode<Key, Val>* [nodeHeight+1];
     for(int x = 1; x <= nodeHeight; ++x) {

@@ -1,14 +1,14 @@
 template <class Key, class Val>
 class SkipList {
     public:
-        SkipList(float, int, const Key&);
+        SkipList(int maxHeight);
         SkipList();
         ~SkipList();
 
         struct iterator;
         struct reverse_iterator;
 
-        bool insert(const Key&, Val*);
+        bool insert(const Key&, Val&);
         bool erase(const Key);
         const Val& find(const Key&);
         void print(std::ostream &);
@@ -27,7 +27,6 @@ class SkipList {
     private:
         SkipListNode<Key, Val>* head;
         SkipListNode<Key, Val>* tail;
-        float probability;
         int maxHeight;
         int currentHeight;
         unsigned int _size;

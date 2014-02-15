@@ -8,7 +8,6 @@
 #include "exceptions/LowerBoundNotFoundException.cpp"
 #include "exceptions/UpperBoundNotFoundException.cpp"
 
-
 template <class Key, class Val>
 struct SkipList<Key, Val>::iterator {
     typedef iterator self_type;
@@ -88,29 +87,31 @@ struct SkipList<Key,Val>::reverse_iterator {
 };
 
 template <class Key, class Val>
-SkipList<Key, Val>::SkipList():  currentHeight(1) {
-    maxHeight = 15;
+SkipList<Key, Val>::SkipList():
+    currentHeight(1),
+    maxHeight(15)
+{
     head = new SkipListNode<Key, Val>(maxHeight);
-    tail = 0;
+    tail = new SkipListNode<Key, Val>(maxHeight);
     for(int i = 0; i < maxHeight; ++i) {
         head->next[i] = tail;
     }
 }
 
 template <class Key, class Val>
-SkipList<Key, Val>::SkipList(float theProbability, int theMaxHeight, const Key &maxKey) {
-    currentHeight = 1;
-    maxHeight = theMaxHeight;
-    probability = theProbability;
-    randomizer = new RandomHeight(theMaxHeight, theProbability);
-
+SkipList<Key, Val>::SkipList(int theMaxHeight):
+    currentHeight(1),
+    maxHeight(theMaxHeight)
+{
     head = new SkipListNode<Key, Val>(theMaxHeight);
-    tail = new SkipListNode<Key, Val>(maxKey, (Val*)0, theMaxHeight);
-    for (int i = 0; i < theMaxHeight; ++i) head->next[i] = tail;
+    tail = new SkipListNode<Key, Val>(theMaxHeight);
+    for (int i = 0; i < theMaxHeight; ++i) {
+        head->next[i] = tail;
+    }
 }
 
 template <class Key, class Val>
-bool SkipList<Key, Val>::insert(const Key &theKey, Val* theValue) {
+bool SkipList<Key, Val>::insert(const Key &theKey, Val &theValue) {
     int level = 0, h = currentHeight - 1;
     SkipListNode<Key, Val>** toUpdate = new SkipListNode<Key, Val>*[maxHeight];
     SkipListNode<Key, Val>* tempNode = head;
@@ -132,7 +133,7 @@ bool SkipList<Key, Val>::insert(const Key &theKey, Val* theValue) {
     }
 
     // Get a random level for the node to be inserted into.
-    level = randomizer->newLevel();
+    level = rand() % maxHeight + 1;
     if(level > currentHeight) {
         // Create all the levels between the previous and new currentHeight
         // and add them to the update matrix.
@@ -163,7 +164,6 @@ bool SkipList<Key, Val>::erase(const Key theKey) {
     SkipListNode<Key,Val>* tempNode = head;
     Key compareKey;
 
-    // TODO: extract this to a common private function.
     for (int h = currentHeight - 1; h >= 0; --h) {
         if(tempNode->next[h] != tail) {
             compareKey = tempNode->next[h]->getKey();
@@ -193,7 +193,7 @@ bool SkipList<Key, Val>::erase(const Key theKey) {
 
         // Adjust currentHeight.
         while ((currentHeight > 1) &&
-            (head->next[currentHeight-1]->getKey() == tail->getKey())) {
+            (head->next[currentHeight-1] == tail)) {
             // If there are no nodes at currentHeight, decrement the value - no need to poke around there.
             --currentHeight;
         }
@@ -212,23 +212,25 @@ bool SkipList<Key, Val>::erase(const Key theKey) {
 
 template <class Key, class Val>
 const Val& SkipList<Key, Val>::find(const Key &theKey) {
-    int h = currentHeight - 1;
-    SkipListNode<Key, Val>* tempNode = head;
-
     if (empty()) {
         throw ElementNotFoundException<Key>(theKey);
     }
+
+    int h = currentHeight - 1;
+    SkipListNode<Key, Val>* tempNode = head;
 
     for (; h >= 0; --h) {
         while (tempNode->next[h] != tail && tempNode->next[h]->getKey() < theKey) {
             tempNode = tempNode->next[h];
         }
+
+        if (tempNode->getKey() == theKey) {
+            // Success!
+            return tempNode->getVal();
+        }
     }
 
-
-
     tempNode = tempNode->next[0];
-
     if (tempNode->getKey() == theKey) {
         // Success!
         return tempNode->getVal();

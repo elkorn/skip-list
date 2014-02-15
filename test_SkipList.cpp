@@ -12,20 +12,20 @@ int main(int argc, char** argv) {
     string maxKey = "Z";
     string testKey1 = "a", testKey2 = "c", testKey3 = "dddd";
     int testVal1 = 12, testVal2 = 1238, testVal3 = 124546, testVal4 = 5;
-    SkipList<string, int> *theList = new SkipList<string, int>((float).6, 5, maxKey);
+    SkipList<string, int> *theList = new SkipList<string, int>(5);
     SkipList<string, string> *emptyList = new SkipList<string, string>();
 
     /* BASIC API TESTS */
 
-    theList->insert("a", &testVal1);
-    theList->insert("c", &testVal2);
+    theList->insert("a", testVal1);
+    theList->insert("c", testVal2);
     theList->find("c"); // removing this causes a segfault.
     try {
         theList->find("xxyzzyxx");
         assert(false && "It should throw an exception when searching for a non-existent key.");
     } catch(ElementNotFoundException<string> &ex) { }
 
-    theList->insert("b", &testVal3);
+    theList->insert("b", testVal3);
     assert(emptyList->empty() == 1);
     assert(theList->empty() == 0);
     assert(theList->size() == 3);
@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
     assert(emptyList->count("c") == 0);
     theList->erase("b");
     assert(theList->size() == 2 && "It should erase the 'b' element.");
-    theList->insert("b", &testVal3);
+    theList->insert("b", testVal3);
 
     /* ITERATOR TESTS */
 
@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
         assert(false &&  "[FAIL] The upper bound for an existing element with a key greater than any key conatined within the set should not exist.");
     } catch(UpperBoundNotFoundException<string>& ex) { }
 
-    theList->insert("d", &testVal4);
+    theList->insert("d", testVal4);
     std::pair<SkipList<string, int>::iterator, SkipList<string, int>::iterator> equalRange = theList->equal_range("c");
 
     assert(*(equalRange.first) == testVal2 && "The first element of the equal range should equal the lower bound for that key.");
