@@ -2,6 +2,9 @@
 #include "SkipListNode.cpp"
 #include "RandomHeight.cpp"
 #include "ElementNotFoundException.cpp"
+#include "LowerBoundNotFoundException.cpp"
+#include "UpperBoundNotFoundException.cpp"
+#include <utility>
 
 template <class Key, class Val>
 class SkipList {
@@ -21,7 +24,7 @@ class SkipList {
         struct iterator {
             typedef iterator self_type;
             typedef SkipListNode<Key, Val> value_type;
- 
+
             iterator(value_type *start) {
                 current = start;
             }
@@ -98,7 +101,9 @@ class SkipList {
         iterator end();
         reverse_iterator rbegin();
         reverse_iterator rend();
-
+        iterator lower_bound(const Key& theKey);
+        iterator upper_bound(const Key& theKey);
+        std::pair<iterator, iterator> equal_range(const Key& theKey);
 
     private:
         SkipListNode<Key, Val>* head;
@@ -327,4 +332,57 @@ typename SkipList<Key, Val>::reverse_iterator SkipList<Key, Val>::rbegin() {
 template <class Key, class Val>
 typename SkipList<Key, Val>::reverse_iterator SkipList<Key, Val>::rend() {
     return SkipList<Key, Val>::reverse_iterator(head);
+}
+
+template <class Key, class Val>
+typename SkipList<Key, Val>::iterator SkipList<Key, Val>::lower_bound(const Key& theKey) {
+    int h = currentHeight - 1;
+    SkipListNode<Key, Val>* tempNode = head;
+
+    if (empty()) {
+        throw ElementNotFoundException<Key>(theKey);
+    }
+
+    for (; h >= 0; --h) {
+        while (tempNode->next[h] != tail && tempNode->next[h]->getKey() < theKey) {
+            tempNode = tempNode->next[h];
+        }
+    }
+
+    tempNode = tempNode->next[0];
+
+    if(tempNode == tail) {
+        throw LowerBoundNotFoundException<Key>(theKey);
+    }
+
+    return iterator(tempNode);
+}
+
+template <class Key, class Val>
+typename SkipList<Key, Val>::iterator SkipList<Key, Val>::upper_bound(const Key& theKey) {
+    int h = currentHeight - 1;
+    SkipListNode<Key, Val>* tempNode = head;
+
+    if (empty()) {
+        throw ElementNotFoundException<Key>(theKey);
+    }
+
+    for (; h >= 0; --h) {
+        while (tempNode->next[h] != tail && tempNode->next[h]->getKey() <= theKey) {
+            tempNode = tempNode->next[h];
+        }
+    }
+
+    tempNode = tempNode->next[0];
+
+    if(tempNode == tail) {
+        throw UpperBoundNotFoundException<Key>(theKey);
+    }
+
+    return iterator(tempNode);
+}
+
+template <class Key, class Val>
+std::pair<typename SkipList<Key, Val>::iterator, typename SkipList<Key, Val>::iterator> SkipList<Key, Val>::equal_range(const Key& theKey) {
+    return std::pair<SkipList<Key, Val>::iterator, SkipList<Key, Val>::iterator>(lower_bound(theKey), upper_bound(theKey));
 }
