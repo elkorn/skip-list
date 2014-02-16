@@ -3,7 +3,7 @@
 #include "exceptions/WrongProbabilityException.cpp"
 
 RandomHeight::RandomHeight(int theMaxLevel, float theProbability) {
-    if(theProbability > 100 || theProbability < 0) throw WrongProbabilityException(theProbability);
+    if(theProbability > 1 || theProbability < 0) throw WrongProbabilityException(theProbability);
     maxLevel = theMaxLevel;
     probability = theProbability * RAND_MAX;
 }

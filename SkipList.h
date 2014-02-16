@@ -30,5 +30,5 @@ class SkipList {
         int maxHeight;
         int currentHeight;
         unsigned int _size;
-        RandomHeight* randomizer;
+        RandomHeight *randomizer;
 };

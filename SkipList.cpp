@@ -94,6 +94,7 @@ SkipList<Key, Val>::SkipList():
 {
     head = new SkipListNode<Key, Val>(maxHeight);
     tail = new SkipListNode<Key, Val>(maxHeight);
+    randomizer = new RandomHeight(maxHeight, .5);
     for(int i = 0; i < maxHeight; ++i) {
         head->next[i] = tail;
     }
@@ -107,6 +108,7 @@ SkipList<Key, Val>::SkipList(int theMaxHeight):
 {
     head = new SkipListNode<Key, Val>(theMaxHeight);
     tail = new SkipListNode<Key, Val>(theMaxHeight);
+    randomizer = new RandomHeight(theMaxHeight, .5);
     for (int i = 0; i < theMaxHeight; ++i) {
         head->next[i] = tail;
     }
@@ -139,7 +141,8 @@ bool SkipList<Key, Val>::insert(const Key &theKey, Val &theValue) {
     }
 
     // Get a random level for the node to be inserted into.
-    level = rand() % maxHeight + 1;
+    level = randomizer->newLevel();
+    // level = rand() % maxHeight + 1;
     if(level > currentHeight) {
         // Create all the levels between the previous and new currentHeight
         // and add them to the update matrix.
@@ -292,11 +295,15 @@ const unsigned int SkipList<Key, Val>::count(const Key& theKey) {
 template <class Key, class Val>
 SkipList<Key, Val>::~SkipList() {
     SkipListNode<Key, Val> *tempNode = head, *nextNode;
-    while(tempNode) {
+    while(tempNode != NULL) {
         nextNode = tempNode->next[0];
+        if(tempNode->prev[0] != NULL) delete tempNode->prev[0];
+        if(nextNode != NULL)          nextNode->prev[0] = NULL;
         delete tempNode;
         tempNode = nextNode;
     }
+
+    delete randomizer;
 }
 
 template <class Key, class Val>

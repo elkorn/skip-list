@@ -26,9 +26,9 @@ SkipListNode<Key, Val>::SkipListNode(const Key &theKey, Val& theVal, int theHeig
     nodeHeight = theHeight;
     key = theKey;
     value = &theVal;
-    next = new SkipListNode<Key, Val>* [nodeHeight+1];
-    prev = new SkipListNode<Key, Val>* [nodeHeight+1];
-    for(int x = 1; x <= nodeHeight; ++x) {
+    next = new SkipListNode<Key, Val>* [nodeHeight];
+    prev = new SkipListNode<Key, Val>* [nodeHeight];
+    for(int x = 0; x < nodeHeight; ++x) {
         next[x] = (SkipListNode<Key, Val>*)0;
         prev[x] = (SkipListNode<Key, Val>*)0;
     }
@@ -39,9 +39,9 @@ SkipListNode<Key, Val>::SkipListNode(int theHeight):
     nodeHeight(theHeight),
     key(Key()),
     value((Val*)0) {
-    next = new SkipListNode<Key, Val>* [nodeHeight+1];
-    prev = new SkipListNode<Key, Val>* [nodeHeight+1];
-    for(int x = 1; x <= nodeHeight; ++x) {
+    next = new SkipListNode<Key, Val>* [nodeHeight];
+    prev = new SkipListNode<Key, Val>* [nodeHeight];
+    for(int x = 0; x < nodeHeight; ++x) {
         next[x] = (SkipListNode<Key, Val>*)0;
         prev[x] = (SkipListNode<Key, Val>*)0;
     }

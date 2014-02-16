@@ -4,6 +4,7 @@
 #include "SkipList.cpp"
 #include <utility>
 #include <time.h>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -102,6 +103,12 @@ int main(int argc, char** argv) {
     } catch (ElementNotFoundException<int> &ex) { }
 
     cout << endl;
+
+    cout << "*** DELETING THE STRUCTURE ***" << endl;
+    delete theList;
+    delete emptyList;
+    delete degenerate;
     cout << "All tests passed!" << endl;
+
     return 0;
 }
