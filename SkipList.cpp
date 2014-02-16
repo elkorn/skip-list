@@ -89,7 +89,8 @@ struct SkipList<Key,Val>::reverse_iterator {
 template <class Key, class Val>
 SkipList<Key, Val>::SkipList():
     currentHeight(1),
-    maxHeight(15)
+    maxHeight(15),
+    _size(0)
 {
     head = new SkipListNode<Key, Val>(maxHeight);
     tail = new SkipListNode<Key, Val>(maxHeight);
@@ -101,7 +102,8 @@ SkipList<Key, Val>::SkipList():
 template <class Key, class Val>
 SkipList<Key, Val>::SkipList(int theMaxHeight):
     currentHeight(1),
-    maxHeight(theMaxHeight)
+    maxHeight(theMaxHeight),
+    _size(0)
 {
     head = new SkipListNode<Key, Val>(theMaxHeight);
     tail = new SkipListNode<Key, Val>(theMaxHeight);
@@ -118,15 +120,19 @@ bool SkipList<Key, Val>::insert(const Key &theKey, Val &theValue) {
 
     // Check all the height levels for where to insert the new node.
     for (; h >= 0; --h) {
-        while (tempNode->next[h] != tail && tempNode->next[h]->getKey() < theKey) {
+        while (tempNode->next[h] != tail && 
+               tempNode->next[h]->getKey() < theKey) {
             tempNode = tempNode->next[h];
         }
 
-        // This node will have to be updated at level h after inserting the new one.
+        // This node will have to be updated at level h
+        // after inserting the new one.
         toUpdate[h] = tempNode;
     }
 
-    if(tempNode->getKey() == theKey) {
+    if(tempNode->getKey() == theKey &&
+       !(tempNode == head ||
+         tempNode == tail)) {
         // We already have this key in the set - cannot insert.
         delete []toUpdate;
         return false;
@@ -137,7 +143,7 @@ bool SkipList<Key, Val>::insert(const Key &theKey, Val &theValue) {
     if(level > currentHeight) {
         // Create all the levels between the previous and new currentHeight
         // and add them to the update matrix.
-        for(int i = currentHeight; i < level; ++i) toUpdate[i] = head; // The default lookup node.
+        for(int i = currentHeight; i < level; ++i) toUpdate[i] = head;
         currentHeight = level;
     }
 
@@ -160,7 +166,7 @@ bool SkipList<Key, Val>::insert(const Key &theKey, Val &theValue) {
 
 template <class Key, class Val>
 bool SkipList<Key, Val>::erase(const Key theKey) {
-    SkipListNode<Key, Val>** toUpdate = new SkipListNode<Key, Val>*[maxHeight+1];
+    SkipListNode<Key, Val>** toUpdate = new SkipListNode<Key, Val>*[maxHeight];
     SkipListNode<Key,Val>* tempNode = head;
     Key compareKey;
 
@@ -183,7 +189,8 @@ bool SkipList<Key, Val>::erase(const Key theKey) {
 
     if (compareKey == theKey) {
         for (int i = 0; i < currentHeight; ++i) {
-            if (toUpdate[i]->next[i] != tempNode) break; // The erased node does not exist at this level.
+            // The erased node might not exist at this level.
+            if (toUpdate[i]->next[i] != tempNode) break;
             // Wire up the pointers.
             toUpdate[i]->next[i] = tempNode->next[i];
             tempNode->next[i]->prev[i] = toUpdate[i];
@@ -194,7 +201,8 @@ bool SkipList<Key, Val>::erase(const Key theKey) {
         // Adjust currentHeight.
         while ((currentHeight > 1) &&
             (head->next[currentHeight-1] == tail)) {
-            // If there are no nodes at currentHeight, decrement the value - no need to poke around there.
+            // If there are no nodes at currentHeight, decrement the value -
+            // no need to poke around there.
             --currentHeight;
         }
 
@@ -220,17 +228,19 @@ const Val& SkipList<Key, Val>::find(const Key &theKey) {
     SkipListNode<Key, Val>* tempNode = head;
 
     for (; h >= 0; --h) {
-        while (tempNode->next[h] != tail && tempNode->next[h]->getKey() < theKey) {
+        while (tempNode == head ||
+               (tempNode->next[h] != tail &&
+                tempNode->next[h]->getKey() < theKey)) {
             tempNode = tempNode->next[h];
-        }
-
-        if (tempNode->getKey() == theKey) {
-            // Success!
-            return tempNode->getVal();
         }
     }
 
-    tempNode = tempNode->next[0];
+    // This condition protects against a case when an item with the same key as
+    // the tail is residing within the structure.
+    if(tempNode->next[0] != tail) {
+        tempNode = tempNode->next[0];
+    }
+
     if (tempNode->getKey() == theKey) {
         // Success!
         return tempNode->getVal();
