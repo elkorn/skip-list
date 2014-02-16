@@ -227,22 +227,16 @@ const Val& SkipList<Key, Val>::find(const Key &theKey) {
         throw ElementNotFoundException<Key>(theKey);
     }
 
-    int h = currentHeight - 1;
     SkipListNode<Key, Val>* tempNode = head;
 
-    for (; h >= 0; --h) {
-        while (tempNode == head ||
-               (tempNode->next[h] != tail &&
-                tempNode->next[h]->getKey() < theKey)) {
+    for (int h = currentHeight - 1; h >= 0; --h) {
+        while (tempNode->next[h] != tail &&
+               tempNode->next[h]->getKey() < theKey) {
             tempNode = tempNode->next[h];
         }
     }
 
-    // This condition protects against a case when an item with the same key as
-    // the tail is residing within the structure.
-    if(tempNode->next[0] != tail) {
-        tempNode = tempNode->next[0];
-    }
+    tempNode = tempNode->next[0];
 
     if (tempNode->getKey() == theKey) {
         // Success!

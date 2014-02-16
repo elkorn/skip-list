@@ -8,15 +8,15 @@
 using namespace std;
 int main(int argc, char** argv) {
     srand(time(0));
-    SkipList<int, int> *theList = new SkipList<int, int> (5);
-    set<int> *theSet = new set<int>();
-    string val = "a";
     int MAX = 1000000;
     int* values = new int[MAX];
     clock_t start, time;
     /* SETUP */
     for(int i = 0; i < MAX; ++i) values[i] = rand();
     for(int LIMIT = 10; LIMIT <= MAX; LIMIT *= 10) {
+        SkipList<int, int> *theList = new SkipList<int, int> (5);
+        set<int> *theSet = new set<int>();
+        string val = "a";
         /* RUN */
         // insertion
         cout << "INSERTION (" << LIMIT << ")" << endl;
@@ -33,24 +33,26 @@ int main(int argc, char** argv) {
         // searching
         cout << "SEARCHING (" << LIMIT << ")" << endl;
         start = clock();
-        for(int i = 1; i < LIMIT; ++i) theList->find(i);
+        for(int i = 0; i < LIMIT; ++i) theList->find(i);
         time = clock() - start;
         cout << "[skip-list]: " << time << endl;
         start = clock();
-        for(int i = 1; i < LIMIT; ++i) theSet->find(i);
+        for(int i = 0; i < LIMIT; ++i) theSet->find(i);
         time = clock() - start;
         cout << "[set]: " << time << endl;
 
         // erasing
         cout << "ERASING (" << LIMIT << ")" << endl;
         start = clock();
-        for(int i = 1; i < LIMIT; ++i) theList->erase(i);
+        for(int i = 0; i < LIMIT; ++i) theList->erase(i);
         time = clock() - start;
         cout << "[skip-list]: " << time << endl;
         start = clock();
-        for(int i = 1; i < LIMIT; ++i) theSet->erase(i);
+        for(int i = 0; i < LIMIT; ++i) theSet->erase(i);
         time = clock() - start;
         cout << "[set]: " << time << endl;
+        delete theList;
+        delete theSet;
     }
 
     return 0;
