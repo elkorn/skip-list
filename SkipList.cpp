@@ -149,7 +149,12 @@ bool SkipList<Key, Val>::insert(const Key &theKey, Val &theValue) {
     }
 
     // Get a random level for the node to be inserted into.
-    level = randomizer->newLevel();
+    int randomLevel = rand() % maxHeight + 1;
+    while(rand() % 101 < 50) {
+        randomLevel = rand() % maxHeight + 1;
+    }
+
+    level = randomLevel;
     if(level > currentHeight) {
         // Create all the levels between the previous and new currentHeight
         // and add them to the update matrix.
@@ -158,6 +163,7 @@ bool SkipList<Key, Val>::insert(const Key &theKey, Val &theValue) {
     }
 
     // tempNode->next[level] nie powinno istnieć, a zawiera 0x51 (?!)
+    SkipListNode<Key, Val> *test = new SkipListNode<Key, Val>(level);
     tempNode = new SkipListNode<Key, Val>(theKey, theValue, level);
 
     // Actually insert the node where it belongs.
@@ -230,7 +236,7 @@ bool SkipList<Key, Val>::erase(const Key theKey) {
 template <class Key, class Val>
 typename SkipList<Key, Val>::iterator SkipList<Key, Val>::find(const Key &theKey) {
     if (empty()) {
-        throw ElementNotFoundException<Key>(theKey);
+        return end();
     }
 
     SkipListNode<Key, Val>* tempNode = head;
@@ -249,7 +255,7 @@ typename SkipList<Key, Val>::iterator SkipList<Key, Val>::find(const Key &theKey
         return SkipList<Key, Val>::iterator(tempNode);
     }
 
-    throw ElementNotFoundException<Key>(theKey);
+    return end();
 }
 
 template <class Key, class Val>
@@ -284,12 +290,8 @@ const unsigned int SkipList<Key, Val>::size() {
 
 template <class Key, class Val>
 const unsigned int SkipList<Key, Val>::count(const Key& theKey) {
-    try {
-        find(theKey);
-        return 1;
-    } catch(ElementNotFoundException<Key>& e) {
-        return 0;
-    }
+    if(find(theKey) == end()) return 0;
+    else return 1;
 }
 
 template <class Key, class Val>

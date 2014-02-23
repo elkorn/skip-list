@@ -24,18 +24,18 @@ template <class Key, class Val>
 SkipListNode<Key, Val>::SkipListNode(const Key &theKey, Val& theVal, const int theHeight):
     key(theKey),
     value(&theVal),
-    height(theHeight),
-    next(new SkipListNode<Key, Val>* [theHeight]),
-    prev(new SkipListNode<Key, Val>* [theHeight]){
+    height(theHeight) {
+        next = new SkipListNode<Key, Val>* [theHeight];
+        prev = new SkipListNode<Key, Val>* [theHeight];
 }
 
 template <class Key, class Val>
 SkipListNode<Key, Val>::SkipListNode(const int theHeight):
     key(Key()),
     value((Val*)0),
-    height(theHeight),
-    next(new SkipListNode<Key, Val>* [theHeight]),
-    prev(new SkipListNode<Key, Val>* [theHeight]){
+    height(theHeight) {
+    next = new SkipListNode<Key, Val>* [theHeight];
+    prev = new SkipListNode<Key, Val>* [theHeight];
 }
 
 template <class Key, class Val>

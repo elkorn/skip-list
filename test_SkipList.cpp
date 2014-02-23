@@ -21,11 +21,7 @@ int main(int argc, char** argv) {
     theList->insert("a", testVal1);
     theList->insert("c", testVal2);
     theList->find("c"); // removing this causes a segfault. No more?
-    try {
-        theList->find("xxyzzyxx");
-        assert(false && "It should throw an exception when searching for a non-existent key.");
-    } catch(ElementNotFoundException<string> &ex) { }
-
+    assert(theList->find("xxyzzyxx") == theList->end() && "It should throw an exception when searching for a non-existent key.");
     theList->insert("b", testVal3);
     assert(emptyList->empty() == 1);
     assert(theList->empty() == 0);
@@ -97,10 +93,7 @@ int main(int argc, char** argv) {
     assert(degenerate->find(0)->getVal() == testVal1 && "It should be possible to find an element placed under the key equal to the default value of given type.");
     assert(degenerate->erase(0) == true && "It should be possible to erase an element placed under the key equal to the default value of given type.");
     assert(degenerate->size() == 0);
-    try {
-        degenerate->find(0);
-        assert(false && "The erased element should not exist in the structure.");
-    } catch (ElementNotFoundException<int> &ex) { }
+    assert(degenerate->find(0) == degenerate->end() && "The erased element should not exist in the structure.");
 
     cout << endl;
 
