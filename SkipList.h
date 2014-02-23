@@ -30,5 +30,6 @@ class SkipList {
         int maxHeight;
         int currentHeight;
         unsigned int _size;
-        RandomHeight *randomizer;
+        SkipListNode<Key, Val>** toUpdate;
+        ExponentialRandomHeight *randomizer;
 };

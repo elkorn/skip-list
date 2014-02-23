@@ -1,12 +1,17 @@
 #include <iostream>
 #include "SkipListNode.cpp"
-#include "RandomHeight.cpp"
+#include "ExponentialRandomHeight.cpp"
 #include "SkipList.h"
 #include <utility>
 
 #include "exceptions/ElementNotFoundException.cpp"
 #include "exceptions/LowerBoundNotFoundException.cpp"
 #include "exceptions/UpperBoundNotFoundException.cpp"
+
+// operator =
+// Konstruktor kopiujący, pusty, z zasięgiem
+// insert z zakresem
+// swap
 
 template <class Key, class Val>
 struct SkipList<Key, Val>::iterator {
@@ -89,12 +94,13 @@ struct SkipList<Key,Val>::reverse_iterator {
 template <class Key, class Val>
 SkipList<Key, Val>::SkipList():
     currentHeight(1),
-    maxHeight(15),
+    maxHeight(32),
     _size(0)
 {
     head = new SkipListNode<Key, Val>(maxHeight);
     tail = new SkipListNode<Key, Val>(maxHeight);
-    randomizer = new RandomHeight(maxHeight, .5);
+    randomizer = new ExponentialRandomHeight(maxHeight, 3.5);
+    toUpdate = new SkipListNode<Key, Val>* [maxHeight];
     for(int i = 0; i < maxHeight; ++i) {
         head->next[i] = tail;
     }
@@ -108,7 +114,8 @@ SkipList<Key, Val>::SkipList(int theMaxHeight):
 {
     head = new SkipListNode<Key, Val>(theMaxHeight);
     tail = new SkipListNode<Key, Val>(theMaxHeight);
-    randomizer = new RandomHeight(theMaxHeight, .5);
+    randomizer = new ExponentialRandomHeight(theMaxHeight, 3.5);
+    toUpdate = new SkipListNode<Key, Val>* [theMaxHeight];
     for (int i = 0; i < theMaxHeight; ++i) {
         head->next[i] = tail;
     }
@@ -117,7 +124,6 @@ SkipList<Key, Val>::SkipList(int theMaxHeight):
 template <class Key, class Val>
 bool SkipList<Key, Val>::insert(const Key &theKey, Val &theValue) {
     int level = 0, h = currentHeight - 1;
-    SkipListNode<Key, Val>** toUpdate = new SkipListNode<Key, Val>*[maxHeight];
     SkipListNode<Key, Val>* tempNode = head;
 
     // Check all the height levels for where to insert the new node.
@@ -129,20 +135,24 @@ bool SkipList<Key, Val>::insert(const Key &theKey, Val &theValue) {
 
         // This node will have to be updated at level h
         // after inserting the new one.
+        // Prealokować toUpdate i tym podobne struktury w konstruktorze całej
+        // listy, usuwać w destruktorze.
         toUpdate[h] = tempNode;
     }
 
-    if(tempNode->getKey() == theKey &&
+    // Inny test -> if !(a<b) && !(b<a)
+    // Zwracamie std::pair(bool, iterator) -> true/false - wynik operacji
+    if(!(tempNode->getKey() < theKey || theKey < tempNode->getKey()) &&
        !(tempNode == head ||
          tempNode == tail)) {
         // We already have this key in the set - cannot insert.
-        delete []toUpdate;
         return false;
     }
 
     // Get a random level for the node to be inserted into.
+    // Losowanie powinno być realizowane z rozkładem wykładniczym.
+    // Użycie wbudowanych generatorów.
     level = randomizer->newLevel();
-    // level = rand() % maxHeight + 1;
     if(level > currentHeight) {
         // Create all the levels between the previous and new currentHeight
         // and add them to the update matrix.
@@ -153,7 +163,13 @@ bool SkipList<Key, Val>::insert(const Key &theKey, Val &theValue) {
     tempNode = new SkipListNode<Key, Val>(theKey, theValue, level);
 
     // Actually insert the node where it belongs.
+    // W tej pętli powinno być obliczane prawdopodobieństwo wstawiania na każdy
+    // poziom (losowanei co level).
     for (int i = 0; i < level; ++i) {
+    if(i == 19) {
+        int breakpoint = 1;
+        }
+
         tempNode->next[i] = toUpdate[i]->next[i];
         tempNode->prev[i] = toUpdate[i];
         toUpdate[i]->next[i]->prev[i] = tempNode;
@@ -162,8 +178,6 @@ bool SkipList<Key, Val>::insert(const Key &theKey, Val &theValue) {
 
     ++_size;
 
-    // Success!
-    delete[] toUpdate;
     return true;
 }
 
@@ -289,6 +303,7 @@ const unsigned int SkipList<Key, Val>::count(const Key& theKey) {
 template <class Key, class Val>
 SkipList<Key, Val>::~SkipList() {
     SkipListNode<Key, Val> *tempNode = head, *nextNode;
+    delete []toUpdate;
     while(tempNode != NULL) {
         nextNode = tempNode->next[0];
         if(tempNode->prev[0] != NULL) delete tempNode->prev[0];
