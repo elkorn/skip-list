@@ -1,7 +1,7 @@
 #include <iostream>
 #include "SkipList.cpp"
 #include <ctime>
-
+#include <fstream>
 using namespace std;
 
 int main()
@@ -12,6 +12,8 @@ int main()
   const int nintervals=32; // number of intervals
   const double lambda = 3.5;
   SkipList<int, int> *sl = new SkipList<int, int>();
+    ofstream of;
+    of.open("results.csv");
 
   for(int i = 0; i < nrolls; ++i) {
       sl->insert(i, i);
@@ -22,7 +24,6 @@ int main()
   SkipList<int, int>::iterator begin = sl->begin();
 
   int p[nintervals]={};
-
   SkipListNode<int, int> *node, *endNode = (sl->end()->prev[0]->next[0]);
   for (int i=nintervals-1; i>=0; --i) {
     // if(i == 19) continue;

@@ -94,7 +94,7 @@ int main(int argc, char** argv) {
     SkipList<int, int> *degenerate = new SkipList<int, int>();
     assert(degenerate->insert(0,testVal1) == true && "It should be possible to insert an element with a key equal to the default value of given type.");
     assert(degenerate->size() == 1 && "The inserted element should be counted into the overall size of the structure.");
-    assert(degenerate->find(0) == testVal1 && "It should be possible to find an element placed under the key equal to the default value of given type.");
+    assert(degenerate->find(0)->getVal() == testVal1 && "It should be possible to find an element placed under the key equal to the default value of given type.");
     assert(degenerate->erase(0) == true && "It should be possible to erase an element placed under the key equal to the default value of given type.");
     assert(degenerate->size() == 0);
     try {

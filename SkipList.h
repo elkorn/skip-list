@@ -10,7 +10,7 @@ class SkipList {
 
         bool insert(const Key&, Val&);
         bool erase(const Key);
-        const Val& find(const Key&);
+        iterator find(const Key&);
         void print(std::ostream &);
         const bool empty();
         const unsigned int count(const Key&);

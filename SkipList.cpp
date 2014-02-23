@@ -123,11 +123,11 @@ SkipList<Key, Val>::SkipList(int theMaxHeight):
 
 template <class Key, class Val>
 bool SkipList<Key, Val>::insert(const Key &theKey, Val &theValue) {
-    int level = 0, h = currentHeight - 1;
+    int level = 0;
     SkipListNode<Key, Val>* tempNode = head;
 
     // Check all the height levels for where to insert the new node.
-    for (; h >= 0; --h) {
+    for (int h = currentHeight-1; h >= 0; --h) {
         while (tempNode->next[h] != tail && 
                tempNode->next[h]->getKey() < theKey) {
             tempNode = tempNode->next[h];
@@ -140,7 +140,6 @@ bool SkipList<Key, Val>::insert(const Key &theKey, Val &theValue) {
         toUpdate[h] = tempNode;
     }
 
-    // Inny test -> if !(a<b) && !(b<a)
     // Zwracamie std::pair(bool, iterator) -> true/false - wynik operacji
     if(!(tempNode->getKey() < theKey || theKey < tempNode->getKey()) &&
        !(tempNode == head ||
@@ -150,8 +149,6 @@ bool SkipList<Key, Val>::insert(const Key &theKey, Val &theValue) {
     }
 
     // Get a random level for the node to be inserted into.
-    // Losowanie powinno być realizowane z rozkładem wykładniczym.
-    // Użycie wbudowanych generatorów.
     level = randomizer->newLevel();
     if(level > currentHeight) {
         // Create all the levels between the previous and new currentHeight
@@ -160,16 +157,11 @@ bool SkipList<Key, Val>::insert(const Key &theKey, Val &theValue) {
         currentHeight = level;
     }
 
+    // tempNode->next[level] nie powinno istnieć, a zawiera 0x51 (?!)
     tempNode = new SkipListNode<Key, Val>(theKey, theValue, level);
 
     // Actually insert the node where it belongs.
-    // W tej pętli powinno być obliczane prawdopodobieństwo wstawiania na każdy
-    // poziom (losowanei co level).
     for (int i = 0; i < level; ++i) {
-    if(i == 19) {
-        int breakpoint = 1;
-        }
-
         tempNode->next[i] = toUpdate[i]->next[i];
         tempNode->prev[i] = toUpdate[i];
         toUpdate[i]->next[i]->prev[i] = tempNode;
@@ -236,7 +228,7 @@ bool SkipList<Key, Val>::erase(const Key theKey) {
 }
 
 template <class Key, class Val>
-const Val& SkipList<Key, Val>::find(const Key &theKey) {
+typename SkipList<Key, Val>::iterator SkipList<Key, Val>::find(const Key &theKey) {
     if (empty()) {
         throw ElementNotFoundException<Key>(theKey);
     }
@@ -252,9 +244,9 @@ const Val& SkipList<Key, Val>::find(const Key &theKey) {
 
     tempNode = tempNode->next[0];
 
-    if (tempNode->getKey() == theKey) {
+    if (!(theKey < tempNode->getKey() || tempNode->getKey() < theKey)) {
         // Success!
-        return tempNode->getVal();
+        return SkipList<Key, Val>::iterator(tempNode);
     }
 
     throw ElementNotFoundException<Key>(theKey);
@@ -306,7 +298,8 @@ SkipList<Key, Val>::~SkipList() {
     delete []toUpdate;
     while(tempNode != NULL) {
         nextNode = tempNode->next[0];
-        if(tempNode->prev[0] != NULL) delete tempNode->prev[0];
+        if(tempNode != head &&
+           tempNode->prev[0] != NULL) delete tempNode->prev[0];
         if(nextNode != NULL)          nextNode->prev[0] = NULL;
         delete tempNode;
         tempNode = nextNode;
