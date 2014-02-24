@@ -3,8 +3,6 @@
 #include <vector>
 #include <utility>
 
-
-
 template <class Val>
 class SkipList {
     public:
@@ -14,6 +12,7 @@ class SkipList {
         SkipList(int maxHeight);
         SkipList();
         SkipList(iterator first, const iterator last);
+        SkipList(const SkipList& other);
         ~SkipList();
 
         std::pair<bool, iterator> insert(const Val&);
@@ -45,3 +44,5 @@ class SkipList {
         void removeMeaningfulNodes();
         void resetBorderNodes();
 };
+
+

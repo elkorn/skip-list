@@ -2,39 +2,21 @@
 #include <vector>
 template <class Val>
 SkipListNode<Val>::SkipListNode(const Val &theVal, const int theHeight):
-    value(&theVal),
+    value(theVal),
     height(theHeight),
     next(std::vector<SkipListNode *>(theHeight)),
-    prev(std::vector<SkipListNode *>(theHeight))
-{
-    // next = std::vector<SkipListNode*>(theHeight);
-    // prev = std::vector<SkipListNode*>(theHeight);
-    // next[theHeight] = 0;
-    // prev[theHeight] = 0;
-    // for(int i = 0; i < theHeight; ++i) {
-    //     next[i] = (SkipListNode<Val>*)0;
-    //     prev[i] = (SkipListNode<Val>*)0;
-    // }
-}
+    prev(std::vector<SkipListNode *>(theHeight)) { }
 
 template <class Val>
 SkipListNode<Val>::SkipListNode(const int theHeight):
-    value((Val *)0),
+    value(Val()),
     height(theHeight),
     next(std::vector<SkipListNode *>(theHeight)),
-    prev(std::vector<SkipListNode *>(theHeight))
-{
-    // next = std::vector<SkipListNode*>(theHeight);
-    // prev = std::vector<SkipListNode*>(theHeight);
-    // for(int i = 0; i < theHeight; ++i) {
-    //     next[i] = (SkipListNode<Val>*)0;
-    //     prev[i] = (SkipListNode<Val>*)0;
-    // }
-}
+    prev(std::vector<SkipListNode *>(theHeight)) { }
 
 template <class Val>
 SkipListNode<Val>::SkipListNode(const SkipListNode<Val> &other):
-    value(other.value),
+    value(Val(other.value)),
     height(other.height),
     next(std::vector<SkipListNode *>(other.next)),
     prev(std::vector<SkipListNode *>(other.prev)) { }
@@ -42,7 +24,7 @@ SkipListNode<Val>::SkipListNode(const SkipListNode<Val> &other):
 template <class Val>
 const Val &SkipListNode<Val>::getVal()
 {
-    return *value;
+    return value;
 }
 
 template <class Val>
@@ -63,11 +45,6 @@ SkipListNode<Val>::~SkipListNode()
 {
     next.clear();
     prev.clear();
-    // delete []next;
-    // delete []prev;
-
-    // next = 0;
-    // prev = 0;
 }
 
 

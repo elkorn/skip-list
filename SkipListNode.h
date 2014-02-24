@@ -12,7 +12,7 @@ struct SkipListNode {
         SkipListNode(const SkipListNode&);
         ~SkipListNode();
  
-        bool valueEquals(const Val& otherVal);
+        bool valueEquals(const Val&);
 
         const Val& getVal();
         const int getHeight();
@@ -21,5 +21,5 @@ struct SkipListNode {
 
     private:
         const int height;
-        const Val* value;
+        const Val& value;
 };

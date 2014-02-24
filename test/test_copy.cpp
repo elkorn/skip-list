@@ -21,12 +21,9 @@ int main(int argc, char** argv) {
     theList->insert(testVal3);
     theList->insert(testVal4);
 
-
-    //SkipList<string> *emptyList = new SkipList<string>(*theList);
-
-    //delete emptyList;
-    cout << "All tests passed!" << endl;
-
+    SkipList<int> *copiedList = new SkipList<int>(*theList);
+    delete copiedList;
     delete theList;
+    cout << "All tests passed!" << endl;
     return 0;
 }

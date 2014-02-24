@@ -2,9 +2,8 @@
 #include "SkipList.h"
 
 #define DEFAULT_HEIGHT 32
+#define DEFAULT_LAMBDA 3.5
 // operator =
-// Konstruktor kopiujący, pusty, z zasięgiem
-// insert z zakresem
 // swap
 
 template <class Val>
@@ -108,7 +107,7 @@ SkipList<Val>::SkipList():
     _size(0),
     head(new SkipListNode<Val>(DEFAULT_HEIGHT)),
     tail(new SkipListNode<Val>(DEFAULT_HEIGHT)),
-    randomizer(new ExponentialRandomHeight(DEFAULT_HEIGHT, 3.5)),
+    randomizer(new ExponentialRandomHeight(DEFAULT_HEIGHT, DEFAULT_LAMBDA)),
     toUpdate(std::vector<SkipListNode<Val>*>(DEFAULT_HEIGHT))
 {
     resetBorderNodes();
@@ -121,7 +120,7 @@ SkipList<Val>::SkipList(int theMaxHeight):
     _size(0),
     head(new SkipListNode<Val>(theMaxHeight)),
     tail(new SkipListNode<Val>(theMaxHeight)),
-    randomizer(new ExponentialRandomHeight(theMaxHeight, 3.5)),
+    randomizer(new ExponentialRandomHeight(theMaxHeight, DEFAULT_LAMBDA)),
     toUpdate(std::vector<SkipListNode<Val>*>(theMaxHeight))
 {
     resetBorderNodes();
@@ -134,7 +133,7 @@ SkipList<Val>::SkipList(SkipList<Val>::iterator first, const SkipList<Val>::iter
     _size(0),
     head(new SkipListNode<Val>(DEFAULT_HEIGHT)),
     tail(new SkipListNode<Val>(DEFAULT_HEIGHT)),
-    randomizer(new ExponentialRandomHeight(DEFAULT_HEIGHT, 3.5)),
+    randomizer(new ExponentialRandomHeight(DEFAULT_HEIGHT, DEFAULT_LAMBDA)),
     toUpdate(std::vector<SkipListNode<Val>*>(DEFAULT_HEIGHT))
 {
     for (int i = 0; i < maxHeight; ++i)
@@ -150,9 +149,20 @@ SkipList<Val>::SkipList(SkipList<Val>::iterator first, const SkipList<Val>::iter
 }
 
 template <class Val>
+SkipList<Val>::SkipList(const SkipList<Val> &other):
+    currentHeight(1),
+    maxHeight(other.maxHeight),
+    _size(other._size),
+    head(new SkipListNode<Val>(*(other.head))),
+    tail(new SkipListNode<Val>(*(other.tail))),
+    randomizer(new ExponentialRandomHeight(*(other.randomizer))),
+    toUpdate(std::vector<SkipListNode<Val>*>(other.toUpdate)) { }
+
+template <class Val>
 std::pair<bool, typename SkipList<Val>::iterator> SkipList<Val>::insert(const Val &theVal)
 {
-    int level = 0;
+    // Get a random level for the node to be inserted into.
+    const int level = randomizer->newLevel();
     SkipListNode<Val> *tempNode = head;
     SkipListNode<Val> *newNode = 0;
 
@@ -178,8 +188,7 @@ std::pair<bool, typename SkipList<Val>::iterator> SkipList<Val>::insert(const Va
         return std::pair<bool, typename SkipList<Val>::iterator>(false, SkipList<Val>::iterator(tempNode));
     }
 
-    // Get a random level for the node to be inserted into.
-    level = randomizer->newLevel();
+    
     if (level > currentHeight)
     {
         // Create all the levels between the previous and new currentHeight
@@ -340,7 +349,7 @@ void SkipList<Val>::clear()
     resetBorderNodes();
     _size = 0;
     currentHeight = 1;
-    
+
 }
 
 template <class Val>

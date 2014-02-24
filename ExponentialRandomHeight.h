@@ -3,8 +3,8 @@
 class ExponentialRandomHeight {
     public:
         ExponentialRandomHeight(int theMaxLevel, double lambda);
-        ~ExponentialRandomHeight();
-        int newLevel();
+        ExponentialRandomHeight(const ExponentialRandomHeight& other);
+        const int newLevel();
 
     private:
         double generate();
@@ -12,5 +12,5 @@ class ExponentialRandomHeight {
         int maxLevel;
         double lambda;
         std::default_random_engine generator;
-        std::exponential_distribution<double> *distribution;
+        std::exponential_distribution<double> distribution;
 };

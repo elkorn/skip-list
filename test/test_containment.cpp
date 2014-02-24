@@ -22,7 +22,7 @@ int main()
 
     for (int i = 0; i < nrolls; ++i)
     {
-        v[i] = rand();
+        v[i] = i*2;
         sl->insert(v[i]);
     }
 
@@ -31,19 +31,26 @@ int main()
     SkipList<int>::iterator begin = sl->begin();
 
     int p[nintervals] = {};
+    int size;
     SkipListNode<int> *node = 0, *endNode = (sl->end()->prev.at(0)->next.at(0));
-    for (int i = 0; i < nintervals; ++i)
+    for (int i = nintervals-1; i >=0 ; --i)
     {
+        if (node == 0) size = begin->next.size();
+        else           size = node->next.size();
+
         // try
         // {
-            cout << begin->next[i] << ", size: " << begin->next.size() << endl;
-            node = begin->next.at(i);
-            cout << "At level " << i << " (with height " << node->getHeight() << ")" << endl;
-            while (node != 0 && node != endNode)
-            {
-                ++p[i];
-                node = node->next.at(i);
-            }
+        cout << "Next level: " << i << endl;
+        cout << "\tNode address at l. " << i << ": " << begin->next[i] << endl;
+        cout << "\tNode height at l. " << i << ": " << size << endl << endl;
+        if(i >= size) continue;
+        node = begin->next.at(i);
+        cout << "At level " << i << " (with height " << node->getHeight() << ")" << endl << endl;
+        while (node != 0 && node != endNode)
+        {
+            ++p[i];
+            node = node->next.at(i);
+        }
         // }
         // catch (const std::out_of_range &oor)
         // {

@@ -3,17 +3,23 @@
 #include <random>
 #include <cmath>
 
-ExponentialRandomHeight::ExponentialRandomHeight(
-        int theMaxLevel,
-        double theLambda):
+ExponentialRandomHeight::ExponentialRandomHeight(int theMaxLevel, double theLambda):
     maxLevel(theMaxLevel),
-    lambda(theLambda) {
-        distribution = new std::exponential_distribution<double>(theLambda);
-}
+    lambda(theLambda),
+    distribution(std::exponential_distribution<double>(theLambda))
+{ }
 
-double ExponentialRandomHeight::generate() {
+ExponentialRandomHeight::ExponentialRandomHeight(const ExponentialRandomHeight &other):
+    maxLevel(other.maxLevel),
+    lambda(other.lambda),
+    generator(other.generator),
+    distribution(other.distribution) { }
+
+double ExponentialRandomHeight::generate()
+{
     double result;
-    while((result = (*distribution)(generator)) >= 1.0) {
+    while ((result = distribution(generator)) >= 1.0)
+    {
         // We are interested only in values [0-1), so another generation is
         // required in case such an unfitting number is produced.
     }
@@ -21,13 +27,10 @@ double ExponentialRandomHeight::generate() {
     return result;
 }
 
-int ExponentialRandomHeight::newLevel() {
+const int ExponentialRandomHeight::newLevel()
+{
     double number = generate();
-    return int(number*maxLevel) + 1;
-}
-
-ExponentialRandomHeight::~ExponentialRandomHeight() {
-    delete distribution;
+    return int(number * maxLevel) + 1;
 }
 
 
