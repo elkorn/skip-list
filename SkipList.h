@@ -17,7 +17,7 @@ class SkipList {
         ~SkipList();
 
         std::pair<bool, iterator> insert(const Val&);
-        bool erase(const Val&);
+        iterator erase(const Val&);
         iterator find(const Val&);
         const bool empty();
         const unsigned int count(const Val&);

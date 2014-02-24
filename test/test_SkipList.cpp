@@ -30,7 +30,7 @@ int main(int argc, char **argv)
     assert(theList->count(testVal2) == 1);
     assert(theList->count(123) == 0);
     assert(emptyList->count("etreu") == 0);
-    theList->erase(testVal3);
+    assert(theList->erase(testVal3) == theList->end());
     assert(theList->size() == 2 && "It should erase the 'b' element.");
     theList->insert(testVal3);
     std::pair<bool, SkipList<int>::iterator> insertionResult = theList->insert(testVal3);
@@ -88,7 +88,7 @@ int main(int argc, char **argv)
     assert(degenerate->insert(defaultVal).first == true && "It should be possible to insert an element with a key equal to the default value of given type.");
     assert(degenerate->size() == 1 && "The inserted element should be counted into the overall size of the structure.");
     assert(degenerate->find(defaultVal)->getVal() == defaultVal && "It should be possible to find an element placed under the key equal to the default value of given type.");
-    assert(degenerate->erase(defaultVal) == true && "It should be possible to erase an element placed under the key equal to the default value of given type.");
+    assert(degenerate->erase(defaultVal) == degenerate->end() && "It should be possible to erase an element placed under the key equal to the default value of given type.");
     assert(degenerate->size() == 0);
     assert(degenerate->find(defaultVal) == degenerate->end() && "The erased element should not exist in the structure.");
 
@@ -116,6 +116,7 @@ int main(int argc, char **argv)
     delete theList;
     delete emptyList;
     delete degenerate;
+    delete rangeList;
     cout << "All tests passed!" << endl;
 
     return 0;

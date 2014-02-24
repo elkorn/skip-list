@@ -212,10 +212,9 @@ std::pair<bool, typename SkipList<Val>::iterator> SkipList<Val>::insert(const Va
 }
 
 template <class Val>
-bool SkipList<Val>::erase(const Val &theVal)
+typename SkipList<Val>::iterator SkipList<Val>::erase(const Val &theVal)
 {
     SkipListNode<Val> *tempNode = head;
-
     // Check all the height levels for where to insert the new node.
     for (int h = currentHeight - 1; h >= 0; --h)
     {
@@ -246,6 +245,7 @@ bool SkipList<Val>::erase(const Val &theVal)
             tempNode->next.at(i)->prev.at(i) = toUpdate.at(i);
         }
 
+        SkipList<Val>::iterator ret = iterator(tempNode->next.at(0));
         delete tempNode;
 
         // Adjust currentHeight.
@@ -260,11 +260,11 @@ bool SkipList<Val>::erase(const Val &theVal)
         --_size;
 
         // Success!
-        return true;
+        return ret;
     }
 
     // Node not found - nothing to erase.
-    return false;
+    return end();
 }
 
 template <class Val>
