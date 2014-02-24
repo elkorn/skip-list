@@ -1,10 +1,10 @@
 #include <string.h>
 #include <set>
 #include <iostream>
-#include "SkipList.cpp"
 #include <utility>
 #include <time.h>
 #include <fstream>
+#include "../SkipList.cpp"
 
 // Testy:
 // wydajność - timing dla milionów: inty (random shuffled)
@@ -21,12 +21,12 @@ int main(int argc, char** argv) {
     clock_t start, time;
     ofstream of;
     of.open("creation.csv");
-    SkipListNode<int ,int>* p[MAX]{};
+    SkipListNode<int>* p[MAX]{};
 
     for(int LIMIT = 10000; LIMIT <= MAX; LIMIT += 10000) {
         cout << "Procesing " << LIMIT << " elements..." << endl;
         start = clock();
-        for(int i = 0; i < LIMIT; ++i) p[i]=new SkipListNode<int, int>(i,i,HEIGHT);
+        for(int i = 0; i < LIMIT; ++i) p[i]=new SkipListNode<int>(i,HEIGHT);
         time = clock() - start;
         of << time << endl;
         for(int i = 0; i < LIMIT; ++i) {

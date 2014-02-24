@@ -26,9 +26,9 @@ int main(int argc, char** argv) {
     for(int i = 0; i < MAX; ++i) values[i] = rand();
     for(int LIMIT = 10000; LIMIT <= MAX; LIMIT += 10000) {
         cout << "Procesing " << LIMIT << " elements..." << endl;
-        SkipList<int, int> *theList = new SkipList<int, int> ();
+        SkipList<int> *theList = new SkipList<int> ();
         start = clock();
-        for(int i = 0; i < LIMIT; ++i) theList->insert(i, values[i]);
+        for(int i = 0; i < LIMIT; ++i) theList->insert(values[i]);
         time = clock() - start;
         of << time << endl;
         // set<int> *theSet = new set<int>();

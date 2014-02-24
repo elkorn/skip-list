@@ -1,58 +1,73 @@
-template <class Key, class Val>
-class SkipList;
-
-template <class Key, class Val>
-class SkipListNode {
-    public:
-        SkipListNode(const Key&, Val&, int);
-        // Creates an empty node.
-        SkipListNode(int);
-        ~SkipListNode();
-
-        const Key& getKey();
-        const Val& getVal();
-        SkipListNode** next;
-        SkipListNode** prev;
-
-    private:
-        const Key key;
-        const int height;
-        Val* value;
-};
-
-template <class Key, class Val>
-SkipListNode<Key, Val>::SkipListNode(const Key &theKey, Val& theVal, const int theHeight):
-    key(theKey),
+#include "SkipListNode.h"
+#include <vector>
+template <class Val>
+SkipListNode<Val>::SkipListNode(const Val &theVal, const int theHeight):
     value(&theVal),
-    height(theHeight) {
-        next = new SkipListNode<Key, Val>* [theHeight];
-        prev = new SkipListNode<Key, Val>* [theHeight];
+    height(theHeight),
+    next(std::vector<SkipListNode *>(theHeight)),
+    prev(std::vector<SkipListNode *>(theHeight))
+{
+    // next = std::vector<SkipListNode*>(theHeight);
+    // prev = std::vector<SkipListNode*>(theHeight);
+    // next[theHeight] = 0;
+    // prev[theHeight] = 0;
+    // for(int i = 0; i < theHeight; ++i) {
+    //     next[i] = (SkipListNode<Val>*)0;
+    //     prev[i] = (SkipListNode<Val>*)0;
+    // }
 }
 
-template <class Key, class Val>
-SkipListNode<Key, Val>::SkipListNode(const int theHeight):
-    key(Key()),
-    value((Val*)0),
-    height(theHeight) {
-    next = new SkipListNode<Key, Val>* [theHeight];
-    prev = new SkipListNode<Key, Val>* [theHeight];
+template <class Val>
+SkipListNode<Val>::SkipListNode(const int theHeight):
+    value((Val *)0),
+    height(theHeight),
+    next(std::vector<SkipListNode *>(theHeight)),
+    prev(std::vector<SkipListNode *>(theHeight))
+{
+    // next = std::vector<SkipListNode*>(theHeight);
+    // prev = std::vector<SkipListNode*>(theHeight);
+    // for(int i = 0; i < theHeight; ++i) {
+    //     next[i] = (SkipListNode<Val>*)0;
+    //     prev[i] = (SkipListNode<Val>*)0;
+    // }
 }
 
-template <class Key, class Val>
-const Key& SkipListNode<Key, Val>::getKey() {
-    return key;
-}
+template <class Val>
+SkipListNode<Val>::SkipListNode(const SkipListNode<Val> &other):
+    value(other.value),
+    height(other.height),
+    next(std::vector<SkipListNode *>(other.next)),
+    prev(std::vector<SkipListNode *>(other.prev)) { }
 
-template <class Key, class Val>
-const Val& SkipListNode<Key, Val>::getVal() {
+template <class Val>
+const Val &SkipListNode<Val>::getVal()
+{
     return *value;
 }
 
+template <class Val>
+const int SkipListNode<Val>::getHeight()
+{
+    return height;
+}
 
-template <class Key, class Val>
-SkipListNode<Key, Val>::~SkipListNode() {
-    delete []next;
-    delete []prev;
+template <class Val>
+bool SkipListNode<Val>::valueEquals(const Val &otherVal)
+{
+    return !(getVal() < otherVal || otherVal < getVal());
+}
+
+
+template <class Val>
+SkipListNode<Val>::~SkipListNode()
+{
+    next.clear();
+    prev.clear();
+    // delete []next;
+    // delete []prev;
+
+    // next = 0;
+    // prev = 0;
 }
 
 

@@ -6,8 +6,8 @@
 ExponentialRandomHeight::ExponentialRandomHeight(
         int theMaxLevel,
         double theLambda):
-    lambda(theLambda),
-    maxLevel(theMaxLevel) {
+    maxLevel(theMaxLevel),
+    lambda(theLambda) {
         distribution = new std::exponential_distribution<double>(theLambda);
 }
 

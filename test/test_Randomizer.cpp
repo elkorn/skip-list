@@ -1,6 +1,6 @@
 #include <iostream>
 #include <random>
-#include "ExponentialRandomHeight.cpp"
+#include "../ExponentialRandomHeight.cpp"
 
 int main()
 {

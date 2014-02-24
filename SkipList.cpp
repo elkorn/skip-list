@@ -1,221 +1,257 @@
 #include <iostream>
-#include "SkipListNode.cpp"
-#include "ExponentialRandomHeight.cpp"
 #include "SkipList.h"
-#include <utility>
 
-#include "exceptions/ElementNotFoundException.cpp"
-#include "exceptions/LowerBoundNotFoundException.cpp"
-#include "exceptions/UpperBoundNotFoundException.cpp"
-
+#define DEFAULT_HEIGHT 32
 // operator =
 // Konstruktor kopiujący, pusty, z zasięgiem
 // insert z zakresem
 // swap
 
-template <class Key, class Val>
-struct SkipList<Key, Val>::iterator {
-    typedef iterator self_type;
-    typedef SkipListNode<Key, Val> value_type;
-
-    iterator(value_type *start) {
-        current = start;
-    }
-
-    bool hasNext() {
-        return current->next[0] != 0 && current->next[0]->next[0] != 0;
-    }
-
-    self_type operator ++() {
-        self_type res = *this;
-        current = current->next[0];
-        return res;
-    }
-
-    const Val& operator *() {
-        return current->getVal();
-    }
-
-    value_type *operator ->() {
-        return current;
-    }
-
-    bool operator==(const self_type &other) {
-        return current == other.current;
-    }
-
-    bool operator!=(const self_type &other) {
-        return current != other.current;
-    }
-
-    private:
-        SkipListNode<Key, Val> *current;
-};
-
-template<class Key, class Val>
-struct SkipList<Key,Val>::reverse_iterator {
-    typedef reverse_iterator self_type;
-    typedef SkipListNode<Key, Val> value_type;
-
-    reverse_iterator(value_type *start) {
-        current = start;
-    }
-
-    bool hasNext() {
-        return current->prev[0] != 0 && current->prev[0]->prev[0] != 0;
-    }
-
-    self_type operator ++() {
-        self_type res = *this;
-        current = current->prev[0];
-        return res;
-    }
-
-    const Val& operator *() {
-        return current->getVal();
-    }
-
-    value_type *operator ->() {
-        return current;
-    }
-
-    bool operator==(const self_type &other) {
-        return current == other.current;
-    }
-
-    bool operator!=(const self_type &other) {
-        return current != other.current;
-    }
-
-    private:
-        SkipListNode<Key, Val> *current;
-};
-
-template <class Key, class Val>
-SkipList<Key, Val>::SkipList():
-    currentHeight(1),
-    maxHeight(32),
-    _size(0)
+template <class Val>
+struct SkipList<Val>::iterator
 {
-    head = new SkipListNode<Key, Val>(maxHeight);
-    tail = new SkipListNode<Key, Val>(maxHeight);
-    randomizer = new ExponentialRandomHeight(maxHeight, 3.5);
-    toUpdate = new SkipListNode<Key, Val>* [maxHeight];
-    for(int i = 0; i < maxHeight; ++i) {
-        head->next[i] = tail;
+    typedef iterator self_type;
+    typedef SkipListNode<Val> value_type;
+
+    iterator(value_type *start)
+    {
+        current = start;
+    }
+
+    bool hasNext()
+    {
+        return current->next.at(0) != 0 && current->next.at(0)->next.at(0) != 0;
+    }
+
+    self_type operator ++()
+    {
+        self_type res = *this;
+        current = current->next.at(0);
+        return res;
+    }
+
+    const Val &operator *()
+    {
+        return current->getVal();
+    }
+
+    value_type *operator ->()
+    {
+        return current;
+    }
+
+    bool operator==(const self_type &other)
+    {
+        return current == other.current;
+    }
+
+    bool operator!=(const self_type &other)
+    {
+        return current != other.current;
+    }
+
+private:
+    SkipListNode<Val> *current;
+};
+
+template<class Val>
+struct SkipList<Val>::reverse_iterator
+{
+    typedef reverse_iterator self_type;
+    typedef SkipListNode<Val> value_type;
+
+    reverse_iterator(value_type *start)
+    {
+        current = start;
+    }
+
+    bool hasNext()
+    {
+        return current->prev.at(0) != 0 && current->prev.at(0)->prev.at(0) != 0;
+    }
+
+    self_type operator ++()
+    {
+        self_type res = *this;
+        current = current->prev.at(0);
+        return res;
+    }
+
+    const Val &operator *()
+    {
+        return current->getVal();
+    }
+
+    value_type *operator ->()
+    {
+        return current;
+    }
+
+    bool operator==(const self_type &other)
+    {
+        return current == other.current;
+    }
+
+    bool operator!=(const self_type &other)
+    {
+        return current != other.current;
+    }
+
+private:
+    SkipListNode<Val> *current;
+};
+
+template <class Val>
+SkipList<Val>::SkipList():
+    currentHeight(1),
+    maxHeight(DEFAULT_HEIGHT),
+    _size(0),
+    head(new SkipListNode<Val>(DEFAULT_HEIGHT)),
+    tail(new SkipListNode<Val>(DEFAULT_HEIGHT)),
+    randomizer(new ExponentialRandomHeight(DEFAULT_HEIGHT, 3.5)),
+    toUpdate(std::vector<SkipListNode<Val>*>(DEFAULT_HEIGHT))
+{
+    for (int i = 0; i < maxHeight; ++i)
+    {
+        head->next.at(i) = tail;
+        tail->prev.at(i) = head;
     }
 }
 
-template <class Key, class Val>
-SkipList<Key, Val>::SkipList(int theMaxHeight):
+template <class Val>
+SkipList<Val>::SkipList(int theMaxHeight):
     currentHeight(1),
     maxHeight(theMaxHeight),
-    _size(0)
+    _size(0),
+    head(new SkipListNode<Val>(theMaxHeight)),
+    tail(new SkipListNode<Val>(theMaxHeight)),
+    randomizer(new ExponentialRandomHeight(theMaxHeight, 3.5)),
+    toUpdate(std::vector<SkipListNode<Val>*>(theMaxHeight))
 {
-    head = new SkipListNode<Key, Val>(theMaxHeight);
-    tail = new SkipListNode<Key, Val>(theMaxHeight);
-    randomizer = new ExponentialRandomHeight(theMaxHeight, 3.5);
-    toUpdate = new SkipListNode<Key, Val>* [theMaxHeight];
-    for (int i = 0; i < theMaxHeight; ++i) {
-        head->next[i] = tail;
+    for (int i = 0; i < maxHeight; ++i)
+    {
+        head->next.at(i) = tail;
+        tail->prev.at(i) = head;
     }
 }
 
-template <class Key, class Val>
-bool SkipList<Key, Val>::insert(const Key &theKey, Val &theValue) {
+template <class Val>
+SkipList<Val>::SkipList(SkipList<Val>::iterator first, const SkipList<Val>::iterator last):
+    currentHeight(1),
+    maxHeight(DEFAULT_HEIGHT),
+    _size(0),
+    head(new SkipListNode<Val>(DEFAULT_HEIGHT)),
+    tail(new SkipListNode<Val>(DEFAULT_HEIGHT)),
+    randomizer(new ExponentialRandomHeight(DEFAULT_HEIGHT, 3.5)),
+    toUpdate(std::vector<SkipListNode<Val>*>(DEFAULT_HEIGHT))
+{
+    for (int i = 0; i < maxHeight; ++i)
+    {
+        head->next.at(i) = tail;
+        tail->prev.at(i) = head;
+    }
+
+    for(first; first != last; ++first) {
+        insert(first->getVal());
+    }
+}
+
+template <class Val>
+std::pair<bool, typename SkipList<Val>::iterator> SkipList<Val>::insert(const Val &theVal)
+{
     int level = 0;
-    SkipListNode<Key, Val>* tempNode = head;
+    SkipListNode<Val> *tempNode = head;
+    SkipListNode<Val> *newNode = 0;
 
     // Check all the height levels for where to insert the new node.
-    for (int h = currentHeight-1; h >= 0; --h) {
-        while (tempNode->next[h] != tail && 
-               tempNode->next[h]->getKey() < theKey) {
-            tempNode = tempNode->next[h];
+    for (int h = currentHeight - 1; h >= 0; --h)
+    {
+        while (tempNode->next.at(h) != tail &&
+                tempNode->next.at(h)->getVal() < theVal)
+        {
+            tempNode = tempNode->next.at(h);
+        }
+
+        // This node will have to be updated at level h
+        // after inserting the new one.
+        toUpdate.at(h) = tempNode;
+    }
+
+    tempNode = tempNode->next.at(0);
+
+    if (isNodeMeaningful(tempNode) && tempNode->valueEquals(theVal))
+    {
+        // We already have this key in the set - cannot insert.
+        return std::pair<bool, typename SkipList<Val>::iterator>(false, SkipList<Val>::iterator(tempNode));
+    }
+
+    // Get a random level for the node to be inserted into.
+    level = randomizer->newLevel();
+    if (level > currentHeight)
+    {
+        // Create all the levels between the previous and new currentHeight
+        // and add them to the update matrix.
+        for (int i = currentHeight; i < level; ++i) toUpdate.at(i) = head;
+        currentHeight = level;
+    }
+
+    // tempNode->next.at(l)vel] nie powinno istnieć, a zawiera 0x51 (?!)
+    newNode = new SkipListNode<Val>(theVal, level);
+
+    // Actually insert the node where it belongs.
+    for (int i = 0; i < level; ++i)
+    {
+        newNode->next.at(i) = toUpdate.at(i)->next.at(i);
+        newNode->prev.at(i) = toUpdate.at(i);
+        toUpdate.at(i)->next.at(i)->prev.at(i) = newNode;
+        toUpdate.at(i)->next.at(i) = newNode;
+    }
+
+    ++_size;
+    return std::pair<bool, typename SkipList<Val>::iterator>(true, SkipList<Val>::iterator(newNode));
+}
+
+template <class Val>
+bool SkipList<Val>::erase(const Val &theVal)
+{
+    SkipListNode<Val> *tempNode = head;
+
+    // Check all the height levels for where to insert the new node.
+    for (int h = currentHeight - 1; h >= 0; --h)
+    {
+        while (tempNode->next.at(h) != tail &&
+                tempNode->next.at(h)->getVal() < theVal)
+        {
+            tempNode = tempNode->next.at(h);
         }
 
         // This node will have to be updated at level h
         // after inserting the new one.
         // Prealokować toUpdate i tym podobne struktury w konstruktorze całej
         // listy, usuwać w destruktorze.
-        toUpdate[h] = tempNode;
-    }
-
-    // Zwracamie std::pair(bool, iterator) -> true/false - wynik operacji
-    if(!(tempNode->getKey() < theKey || theKey < tempNode->getKey()) &&
-       !(tempNode == head ||
-         tempNode == tail)) {
-        // We already have this key in the set - cannot insert.
-        return false;
-    }
-
-    // Get a random level for the node to be inserted into.
-    int randomLevel = rand() % maxHeight + 1;
-    while(rand() % 101 < 50) {
-        randomLevel = rand() % maxHeight + 1;
-    }
-
-    level = randomLevel;
-    if(level > currentHeight) {
-        // Create all the levels between the previous and new currentHeight
-        // and add them to the update matrix.
-        for(int i = currentHeight; i < level; ++i) toUpdate[i] = head;
-        currentHeight = level;
-    }
-
-    // tempNode->next[level] nie powinno istnieć, a zawiera 0x51 (?!)
-    SkipListNode<Key, Val> *test = new SkipListNode<Key, Val>(level);
-    tempNode = new SkipListNode<Key, Val>(theKey, theValue, level);
-
-    // Actually insert the node where it belongs.
-    for (int i = 0; i < level; ++i) {
-        tempNode->next[i] = toUpdate[i]->next[i];
-        tempNode->prev[i] = toUpdate[i];
-        toUpdate[i]->next[i]->prev[i] = tempNode;
-        toUpdate[i]->next[i] = tempNode;
-    }
-
-    ++_size;
-
-    return true;
-}
-
-template <class Key, class Val>
-bool SkipList<Key, Val>::erase(const Key theKey) {
-    SkipListNode<Key, Val>** toUpdate = new SkipListNode<Key, Val>*[maxHeight];
-    SkipListNode<Key,Val>* tempNode = head;
-    Key compareKey;
-
-    for (int h = currentHeight - 1; h >= 0; --h) {
-        if(tempNode->next[h] != tail) {
-            compareKey = tempNode->next[h]->getKey();
-            while(compareKey < theKey &&
-                    tempNode->next[h] != tail) {
-                tempNode = tempNode->next[h];
-                compareKey = tempNode->next[h]->getKey();
-            }
-        }
-
-        toUpdate[h] = tempNode;
+        toUpdate.at(h) = tempNode;
     }
 
     // Get the found node at the base level.
-    tempNode = tempNode->next[0];
-    compareKey = tempNode->getKey();
+    tempNode = tempNode->next.at(0);
 
-    if (compareKey == theKey) {
-        for (int i = 0; i < currentHeight; ++i) {
+    if (tempNode->valueEquals(theVal))
+    {
+        for (int i = 0; i < currentHeight; ++i)
+        {
             // The erased node might not exist at this level.
-            if (toUpdate[i]->next[i] != tempNode) break;
+            if (toUpdate.at(i)->next.at(i) != tempNode) break;
             // Wire up the pointers.
-            toUpdate[i]->next[i] = tempNode->next[i];
-            tempNode->next[i]->prev[i] = toUpdate[i];
+            toUpdate.at(i)->next.at(i) = tempNode->next.at(i);
+            tempNode->next.at(i)->prev.at(i) = toUpdate.at(i);
         }
 
         delete tempNode;
 
         // Adjust currentHeight.
         while ((currentHeight > 1) &&
-            (head->next[currentHeight-1] == tail)) {
+                (head->next.at(currentHeight - 1) == tail))
+        {
             // If there are no nodes at currentHeight, decrement the value -
             // no need to poke around there.
             --currentHeight;
@@ -224,161 +260,178 @@ bool SkipList<Key, Val>::erase(const Key theKey) {
         --_size;
 
         // Success!
-        delete []toUpdate;
         return true;
     }
 
     // Node not found - nothing to erase.
-    delete []toUpdate;
     return false;
 }
 
-template <class Key, class Val>
-typename SkipList<Key, Val>::iterator SkipList<Key, Val>::find(const Key &theKey) {
-    if (empty()) {
+template <class Val>
+typename SkipList<Val>::iterator SkipList<Val>::find(const Val &theVal)
+{
+    if (empty())
+    {
         return end();
     }
 
-    SkipListNode<Key, Val>* tempNode = head;
+    SkipListNode<Val> *tempNode = head;
 
-    for (int h = currentHeight - 1; h >= 0; --h) {
-        while (tempNode->next[h] != tail &&
-               tempNode->next[h]->getKey() < theKey) {
-            tempNode = tempNode->next[h];
+    for (int h = currentHeight - 1; h >= 0; --h)
+    {
+        while (tempNode->next.at(h) != tail &&
+                tempNode->next.at(h)->getVal() < theVal)
+        {
+            tempNode = tempNode->next.at(h);
         }
     }
 
-    tempNode = tempNode->next[0];
+    tempNode = tempNode->next.at(0);
 
-    if (!(theKey < tempNode->getKey() || tempNode->getKey() < theKey)) {
-        // Success!
-        return SkipList<Key, Val>::iterator(tempNode);
+    if (isNodeMeaningful(tempNode))
+    {
+        if (tempNode->valueEquals(theVal))
+        {
+            // Success!
+            return SkipList<Val>::iterator(tempNode);
+        }
     }
 
     return end();
 }
 
-template <class Key, class Val>
-void SkipList<Key, Val>::print(std::ostream &out) {
-    SkipListNode<Key, Val> *tempNode = head;
-
-    while(tempNode != tail) {
-        if(tempNode == head) {
-            out << "HEAD";
-        } else {
-            out << tempNode->getKey();
-        }
-
-        out << std::endl << std::flush;
-        tempNode = tempNode->next[0];
-    }
-
-    out << "TAIL" << std::endl << std::flush;
+template <class Val>
+const bool SkipList<Val>::empty()
+{
+    return head->next.at(0) == tail;
 }
 
-template <class Key, class Val>
-const bool SkipList<Key, Val>::empty() {
-    return head->next[0] == tail;
-}
-
-template <class Key, class Val>
-const unsigned int SkipList<Key, Val>::size() {
-    // To keep the size operation at O(1), the size is being maintained 
+template <class Val>
+const unsigned int SkipList<Val>::size()
+{
+    // To keep the size operation at O(1), the size is being maintained
     // throughout the lifetime of the list.
     return _size;
 }
 
-template <class Key, class Val>
-const unsigned int SkipList<Key, Val>::count(const Key& theKey) {
-    if(find(theKey) == end()) return 0;
+template <class Val>
+const unsigned int SkipList<Val>::count(const Val &theVal)
+{
+    if (find(theVal) == end()) return 0;
     else return 1;
 }
 
-template <class Key, class Val>
-SkipList<Key, Val>::~SkipList() {
-    SkipListNode<Key, Val> *tempNode = head, *nextNode;
-    delete []toUpdate;
-    while(tempNode != NULL) {
-        nextNode = tempNode->next[0];
-        if(tempNode != head &&
-           tempNode->prev[0] != NULL) delete tempNode->prev[0];
-        if(nextNode != NULL)          nextNode->prev[0] = NULL;
+template <class Val>
+bool SkipList<Val>::isNodeMeaningful(SkipListNode<Val> *node)
+{
+    return node != head && node != tail;
+}
+
+template <class Val>
+SkipList<Val>::~SkipList()
+{
+    SkipListNode<Val> *tempNode = head, *nextNode;
+    while (tempNode != 0)
+    {
+        nextNode = tempNode->next.at(0);
+        // if(tempNode != head &&
+        //    tempNode->prev.at(0) != NULL) delete tempNode->prev.at(0);
+        if (nextNode != NULL)          nextNode->prev.at(0) = NULL;
         delete tempNode;
+        tempNode = 0;
         tempNode = nextNode;
     }
 
+    head = 0;
+    tail = 0;
     delete randomizer;
+    randomizer = 0;
 }
 
-template <class Key, class Val>
-typename SkipList<Key, Val>::iterator SkipList<Key, Val>::begin() {
-    return SkipList<Key, Val>::iterator(head->next[0]);
+template <class Val>
+typename SkipList<Val>::iterator SkipList<Val>::begin()
+{
+    return SkipList<Val>::iterator(head->next.at(0));
 }
 
-template <class Key, class Val>
-typename SkipList<Key, Val>::iterator SkipList<Key, Val>::end() {
-    return SkipList<Key, Val>::iterator(tail);
+template <class Val>
+typename SkipList<Val>::iterator SkipList<Val>::end()
+{
+    return SkipList<Val>::iterator(tail);
 }
 
-template <class Key, class Val>
-typename SkipList<Key, Val>::reverse_iterator SkipList<Key, Val>::rbegin() {
-    return SkipList<Key, Val>::reverse_iterator(tail->prev[0]);
+template <class Val>
+typename SkipList<Val>::reverse_iterator SkipList<Val>::rbegin()
+{
+    return SkipList<Val>::reverse_iterator(tail->prev.at(0));
 }
 
-template <class Key, class Val>
-typename SkipList<Key, Val>::reverse_iterator SkipList<Key, Val>::rend() {
-    return SkipList<Key, Val>::reverse_iterator(head);
+template <class Val>
+typename SkipList<Val>::reverse_iterator SkipList<Val>::rend()
+{
+    return SkipList<Val>::reverse_iterator(head);
 }
 
-template <class Key, class Val>
-typename SkipList<Key, Val>::iterator SkipList<Key, Val>::lower_bound(const Key& theKey) {
+template <class Val>
+typename SkipList<Val>::iterator SkipList<Val>::lower_bound(const Val &theVal)
+{
     int h = currentHeight - 1;
-    SkipListNode<Key, Val>* tempNode = head;
+    SkipListNode<Val> *tempNode = head;
 
-    if (empty()) {
-        throw ElementNotFoundException<Key>(theKey);
+    if (empty())
+    {
+        return end();
     }
 
-    for (; h >= 0; --h) {
-        while (tempNode->next[h] != tail && tempNode->next[h]->getKey() < theKey) {
-            tempNode = tempNode->next[h];
+    for (; h >= 0; --h)
+    {
+        while (tempNode->next.at(h) != tail && tempNode->next.at(h)->getVal() < theVal)
+        {
+            tempNode = tempNode->next.at(h);
         }
     }
 
-    tempNode = tempNode->next[0];
+    tempNode = tempNode->next.at(0);
 
-    if(tempNode == tail) {
-        throw LowerBoundNotFoundException<Key>(theKey);
+    if (tempNode == tail)
+    {
+        return end();
     }
 
     return iterator(tempNode);
 }
 
-template <class Key, class Val>
-typename SkipList<Key, Val>::iterator SkipList<Key, Val>::upper_bound(const Key& theKey) {
+template <class Val>
+typename SkipList<Val>::iterator SkipList<Val>::upper_bound(const Val &theVal)
+{
     int h = currentHeight - 1;
-    SkipListNode<Key, Val>* tempNode = head;
+    SkipListNode<Val> *tempNode = head;
 
-    if (empty()) {
-        throw ElementNotFoundException<Key>(theKey);
+    if (empty())
+    {
+        return end();
     }
 
-    for (; h >= 0; --h) {
-        while (tempNode->next[h] != tail && tempNode->next[h]->getKey() <= theKey) {
-            tempNode = tempNode->next[h];
+    for (; h >= 0; --h)
+    {
+        while (tempNode->next.at(h) != tail && tempNode->next.at(h)->getVal() <= theVal)
+        {
+            tempNode = tempNode->next.at(h);
         }
     }
 
-    tempNode = tempNode->next[0];
+    tempNode = tempNode->next.at(0);
 
-    if(tempNode == tail) {
-        throw UpperBoundNotFoundException<Key>(theKey);
+    if (tempNode == tail)
+    {
+        return end();
     }
 
     return iterator(tempNode);
 }
 
-template <class Key, class Val>
-std::pair<typename SkipList<Key, Val>::iterator, typename SkipList<Key, Val>::iterator> SkipList<Key, Val>::equal_range(const Key& theKey) {
-    return std::pair<SkipList<Key, Val>::iterator, SkipList<Key, Val>::iterator>(lower_bound(theKey), upper_bound(theKey));
+template <class Val>
+std::pair<typename SkipList<Val>::iterator, typename SkipList<Val>::iterator> SkipList<Val>::equal_range(const Val &theVal)
+{
+    return std::pair<SkipList<Val>::iterator, SkipList<Val>::iterator>(lower_bound(theVal), upper_bound(theVal));
 }

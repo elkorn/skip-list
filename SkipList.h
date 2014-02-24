@@ -1,35 +1,44 @@
-template <class Key, class Val>
+#include "ExponentialRandomHeight.cpp"
+#include "SkipListNode.cpp"
+#include <vector>
+#include <utility>
+
+
+
+template <class Val>
 class SkipList {
     public:
-        SkipList(int maxHeight);
-        SkipList();
-        ~SkipList();
-
         struct iterator;
         struct reverse_iterator;
 
-        bool insert(const Key&, Val&);
-        bool erase(const Key);
-        iterator find(const Key&);
-        void print(std::ostream &);
+        SkipList(int maxHeight);
+        SkipList();
+        SkipList(iterator first, const iterator last);
+        ~SkipList();
+
+        std::pair<bool, iterator> insert(const Val&);
+        bool erase(const Val&);
+        iterator find(const Val&);
         const bool empty();
-        const unsigned int count(const Key&);
+        const unsigned int count(const Val&);
         const unsigned int size();
 
         iterator begin();
         iterator end();
         reverse_iterator rbegin();
         reverse_iterator rend();
-        iterator lower_bound(const Key& theKey);
-        iterator upper_bound(const Key& theKey);
-        std::pair<iterator, iterator> equal_range(const Key& theKey);
+        iterator lower_bound(const Val& theVal);
+        iterator upper_bound(const Val& theVal);
+        std::pair<iterator, iterator> equal_range(const Val& theVal);
 
     private:
-        SkipListNode<Key, Val>* head;
-        SkipListNode<Key, Val>* tail;
+        SkipListNode<Val>* head;
+        SkipListNode<Val>* tail;
         int maxHeight;
         int currentHeight;
         unsigned int _size;
-        SkipListNode<Key, Val>** toUpdate;
+        std::vector<SkipListNode<Val>*> toUpdate;
         ExponentialRandomHeight *randomizer;
+
+        bool isNodeMeaningful(SkipListNode<Val> *node);
 };
