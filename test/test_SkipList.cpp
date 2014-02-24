@@ -14,6 +14,7 @@ int main(int argc, char **argv)
     string maxKey = "Z";
     int testVal1 = 12, testVal2 = 23, testVal3 = 34, testVal4 = 56, defaultVal = 0;
     SkipList<int> *theList = new SkipList<int>();
+    SkipList<int> *toClear = new SkipList<int>();
     SkipList<string> *emptyList = new SkipList<string>();
 
     /* BASIC API TESTS */
@@ -36,6 +37,18 @@ int main(int argc, char **argv)
     std::pair<bool, SkipList<int>::iterator> insertionResult = theList->insert(testVal3);
     assert(insertionResult.first == false && "Cannot insert duplicate elements into the set.");
     assert(insertionResult.second->getVal() == testVal3 && "Cannot insert duplicate elements into the set.");
+
+    toClear->insert(testVal1);
+    toClear->insert(testVal2);
+    toClear->insert(testVal3);
+    toClear->insert(testVal4);
+    toClear->clear();
+    assert(toClear->size() == 0 && "A cleared list should not have any elements.");
+    assert(toClear->begin() == toClear->end() && "A cleared list should not have any elements.");
+    toClear->insert(testVal1);
+    toClear->insert(testVal2);
+    assert(toClear->size() == 2 && "A cleared list should work normally after the clearing.");
+    assert(toClear->find(testVal1)->getVal() == testVal1 && "A cleared list should work normally after the clearing.");
     cout << endl;
 
     /* ITERATOR TESTS */
@@ -113,10 +126,12 @@ int main(int argc, char **argv)
     assert(rangeList->size() == 3 &&
            "The list created a range should contain all the provided elements except the last one.");
     cout << "*** DELETING THE STRUCTURE ***" << endl;
+
     delete theList;
     delete emptyList;
     delete degenerate;
     delete rangeList;
+    delete toClear;
     cout << "All tests passed!" << endl;
 
     return 0;

@@ -22,6 +22,7 @@ class SkipList {
         const bool empty();
         const unsigned int count(const Val&);
         const unsigned int size();
+        void clear();
 
         iterator begin();
         iterator end();
@@ -41,4 +42,6 @@ class SkipList {
         ExponentialRandomHeight *randomizer;
 
         bool isNodeMeaningful(SkipListNode<Val> *node);
+        void removeMeaningfulNodes();
+        void resetBorderNodes();
 };

@@ -111,11 +111,7 @@ SkipList<Val>::SkipList():
     randomizer(new ExponentialRandomHeight(DEFAULT_HEIGHT, 3.5)),
     toUpdate(std::vector<SkipListNode<Val>*>(DEFAULT_HEIGHT))
 {
-    for (int i = 0; i < maxHeight; ++i)
-    {
-        head->next.at(i) = tail;
-        tail->prev.at(i) = head;
-    }
+    resetBorderNodes();
 }
 
 template <class Val>
@@ -128,11 +124,7 @@ SkipList<Val>::SkipList(int theMaxHeight):
     randomizer(new ExponentialRandomHeight(theMaxHeight, 3.5)),
     toUpdate(std::vector<SkipListNode<Val>*>(theMaxHeight))
 {
-    for (int i = 0; i < maxHeight; ++i)
-    {
-        head->next.at(i) = tail;
-        tail->prev.at(i) = head;
-    }
+    resetBorderNodes();
 }
 
 template <class Val>
@@ -151,7 +143,8 @@ SkipList<Val>::SkipList(SkipList<Val>::iterator first, const SkipList<Val>::iter
         tail->prev.at(i) = head;
     }
 
-    for(first; first != last; ++first) {
+    for (first; first != last; ++first)
+    {
         insert(first->getVal());
     }
 }
@@ -315,6 +308,42 @@ const unsigned int SkipList<Val>::size()
 }
 
 template <class Val>
+void SkipList<Val>::resetBorderNodes()
+{
+    for (int i = 0; i < maxHeight; ++i)
+    {
+        head->next.at(i) = tail;
+        tail->prev.at(i) = head;
+    }
+}
+
+template <class Val>
+void SkipList<Val>::removeMeaningfulNodes()
+{
+    SkipListNode<Val> *tempNode = head->next.at(0), *nextNode;
+    while (tempNode != 0 && tempNode != tail)
+    {
+        nextNode = tempNode->next.at(0);
+        // if(tempNode != head &&
+        //    tempNode->prev.at(0) != NULL) delete tempNode->prev.at(0);
+        if (nextNode != 0)          nextNode->prev.at(0) = 0;
+        delete tempNode;
+        tempNode = 0;
+        tempNode = nextNode;
+    }
+}
+
+template <class Val>
+void SkipList<Val>::clear()
+{
+    removeMeaningfulNodes();
+    resetBorderNodes();
+    _size = 0;
+    currentHeight = 1;
+    
+}
+
+template <class Val>
 const unsigned int SkipList<Val>::count(const Val &theVal)
 {
     if (find(theVal) == end()) return 0;
@@ -330,19 +359,10 @@ bool SkipList<Val>::isNodeMeaningful(SkipListNode<Val> *node)
 template <class Val>
 SkipList<Val>::~SkipList()
 {
-    SkipListNode<Val> *tempNode = head, *nextNode;
-    while (tempNode != 0)
-    {
-        nextNode = tempNode->next.at(0);
-        // if(tempNode != head &&
-        //    tempNode->prev.at(0) != NULL) delete tempNode->prev.at(0);
-        if (nextNode != NULL)          nextNode->prev.at(0) = NULL;
-        delete tempNode;
-        tempNode = 0;
-        tempNode = nextNode;
-    }
-
+    removeMeaningfulNodes();
+    delete head;
     head = 0;
+    delete tail;
     tail = 0;
     delete randomizer;
     randomizer = 0;
