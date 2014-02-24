@@ -1,10 +1,10 @@
 #include <string.h>
 #include <set>
 #include <iostream>
-#include "SkipList.cpp"
 #include <utility>
 #include <time.h>
 #include <fstream>
+#include "../SkipList.cpp"
 
 // Testy:
 // wydajność - timing dla milionów: inty (random shuffled)
@@ -17,6 +17,7 @@ using namespace std;
 int main(int argc, char** argv) {
     srand(time(0));
     const int MAX = 1000000;
+    const int INCREMENT = 10000;
     int* values = new int[MAX];
     clock_t start, time;
     ofstream inserting, erasing, finding, elements;
@@ -27,14 +28,27 @@ int main(int argc, char** argv) {
 
     /* SETUP */
     for(int i = 0; i < MAX; ++i) values[i] = rand();
-    for(int LIMIT = 10000; LIMIT <= MAX; LIMIT += 10000) {
+    for(int LIMIT = INCREMENT; LIMIT <= MAX; LIMIT += INCREMENT) {
         cout << "Procesing " << LIMIT << " elements..." << endl;
+        cout << "\tInsert" << endl;
         SkipList<int> theList = SkipList<int> ();
         elements << LIMIT << endl;
         start = clock();
         for(int i = 0; i < LIMIT; ++i) theList.insert(values[i]);
         time = clock() - start;
         inserting << time << endl;
+
+        cout << "\tFind" << endl;
+        start = clock();
+        for(int i = 0; i < LIMIT; ++i) theList.find(values[i]);
+        time = clock() - start;
+        finding << time << endl;
+
+        cout << "\tErase" << endl;
+        start = clock();
+        for(int i = 0; i < LIMIT; ++i) theList.erase(values[i]);
+        time = clock() - start;
+        erasing << time << endl;
 
         // set<int> *theSet = new set<int>();
         // string val = "a";

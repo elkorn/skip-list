@@ -24,7 +24,7 @@ class SkipList {
         const unsigned int size();
         const unsigned int& getCurrentHeight() const;
         void clear();
-
+        void swap(SkipList &other);
         SkipList& operator=(const SkipList& other);
 
         iterator begin();

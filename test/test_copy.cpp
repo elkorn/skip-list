@@ -11,7 +11,7 @@ using namespace std;
 int main(int argc, char **argv)
 {
     srand(time(0));
-    int testVal1 = 12, testVal2 = 23, testVal3 = 34, testVal4 = 56;
+    int testVal1 = 12, testVal2 = 23, testVal3 = 34, testVal4 = 56, testVal5 = 67;
     SkipList<int> theList = SkipList<int>();
 
     /* BASIC API TESTS */
@@ -52,6 +52,26 @@ int main(int argc, char **argv)
     {
         assert(it1->getVal() == it2->getVal());
     }
+
+
+    SkipList<int> toSwapLeft = SkipList<int>();
+    SkipList<int> toSwapRight = SkipList<int>();
+
+    toSwapLeft.insert(testVal1);
+    toSwapLeft.insert(testVal2);
+    toSwapRight.insert(testVal3);
+    toSwapRight.insert(testVal4);
+    toSwapRight.insert(testVal5);
+
+    toSwapLeft.swap(toSwapRight);
+
+    assert(toSwapLeft.find(testVal3) != toSwapLeft.end());
+    assert(toSwapLeft.find(testVal4) != toSwapLeft.end());
+    assert(toSwapLeft.find(testVal5) != toSwapLeft.end());
+    assert(toSwapLeft.size() == 3);
+    assert(toSwapRight.find(testVal1) != toSwapLeft.end());
+    assert(toSwapRight.find(testVal2) != toSwapLeft.end());
+    assert(toSwapRight.size() == 2);
 
     cout << "All tests passed!" << endl;
     return 0;

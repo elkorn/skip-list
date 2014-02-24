@@ -6,9 +6,6 @@
 #define DEFAULT_HEIGHT 32
 #define DEFAULT_LAMBDA 3.5
 
-// operator =
-// swap
-
 template <class Val>
 struct SkipList<Val>::iterator
 {
@@ -388,6 +385,30 @@ void SkipList<Val>::clear()
     resetBorderNodes();
     _size = 0;
     currentHeight = 1;
+}
+
+template <class Val>
+void SkipList<Val>::swap(SkipList& other) {
+    SkipListNode<Val> *temp = other.head;
+    std::vector<SkipListNode<Val> *> tempToUpdate = other.toUpdate;
+    int tempMaxHeight = other.maxHeight;
+    int tempSize = other._size;
+    int tempCurrentHeight = other.currentHeight;
+
+    other.head = head;
+    head = temp;
+    temp = other.tail;
+    other.tail = tail;
+    tail = temp;
+    other.toUpdate = toUpdate;
+    toUpdate = tempToUpdate;
+
+    other.maxHeight = maxHeight;
+    maxHeight = tempMaxHeight;
+    other._size = _size;
+    _size = tempSize;
+    other.currentHeight = currentHeight;
+    currentHeight = tempCurrentHeight;
 }
 
 template <class Val>
