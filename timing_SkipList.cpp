@@ -16,26 +16,31 @@
 using namespace std;
 int main(int argc, char** argv) {
     srand(time(0));
-    int MAX = 1000000;
+    const int MAX = 1000000;
     int* values = new int[MAX];
     clock_t start, time;
-    ofstream of;
-    of.open("results.csv");
+    ofstream inserting, erasing, finding, elements;
+    elements.open("elements.csv");
+    inserting.open("inserting.csv");
+    finding.open("finding.csv");
+    erasing.open("erasing.csv");
 
     /* SETUP */
     for(int i = 0; i < MAX; ++i) values[i] = rand();
     for(int LIMIT = 10000; LIMIT <= MAX; LIMIT += 10000) {
         cout << "Procesing " << LIMIT << " elements..." << endl;
-        SkipList<int> *theList = new SkipList<int> ();
+        SkipList<int> theList = SkipList<int> ();
+        elements << LIMIT << endl;
         start = clock();
-        for(int i = 0; i < LIMIT; ++i) theList->insert(values[i]);
+        for(int i = 0; i < LIMIT; ++i) theList.insert(values[i]);
         time = clock() - start;
-        of << time << endl;
+        inserting << time << endl;
+
         // set<int> *theSet = new set<int>();
         // string val = "a";
         // /* RUN */
-        // // insertion
-        // cout << "INSERTION (" << LIMIT << ")" << endl;
+        // // inserting
+        // cout << "inserting (" << LIMIT << ")" << endl;
         // start = clock();
         // for(int i = 0; i < LIMIT; ++i) theList->insert(i, values[i]);
         // time = clock() - start;
@@ -67,10 +72,12 @@ int main(int argc, char** argv) {
         // for(int i = 0; i < LIMIT; ++i) theSet->erase(i);
         // time = clock() - start;
         // cout << "[set]: " << time << endl;
-        delete theList;
         // delete theSet;
     }
 
-    of.close();
+    inserting.close();
+    elements.close();
+    finding.close();
+    erasing.close();
     return 0;
 }

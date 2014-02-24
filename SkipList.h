@@ -2,6 +2,7 @@
 #include "SkipListNode.cpp"
 #include <vector>
 #include <utility>
+#include <list>
 
 template <class Val>
 class SkipList {
@@ -21,7 +22,10 @@ class SkipList {
         const bool empty();
         const unsigned int count(const Val&);
         const unsigned int size();
+        const unsigned int& getCurrentHeight() const;
         void clear();
+
+        SkipList& operator=(const SkipList& other);
 
         iterator begin();
         iterator end();
@@ -30,12 +34,17 @@ class SkipList {
         iterator lower_bound(const Val& theVal);
         iterator upper_bound(const Val& theVal);
         std::pair<iterator, iterator> equal_range(const Val& theVal);
+        std::vector<int> bla;
+        std::list<SkipListNode<Val>> list;
+
+        void display();
+        void displvl(int l);
 
     private:
         SkipListNode<Val>* head;
         SkipListNode<Val>* tail;
         int maxHeight;
-        int currentHeight;
+        unsigned int currentHeight;
         unsigned int _size;
         std::vector<SkipListNode<Val>*> toUpdate;
         ExponentialRandomHeight *randomizer;
@@ -43,6 +52,7 @@ class SkipList {
         bool isNodeMeaningful(SkipListNode<Val> *node);
         void removeMeaningfulNodes();
         void resetBorderNodes();
+        void insertRange(iterator first, iterator last);
 };
 
 

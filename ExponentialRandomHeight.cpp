@@ -18,12 +18,13 @@ ExponentialRandomHeight::ExponentialRandomHeight(const ExponentialRandomHeight &
 double ExponentialRandomHeight::generate()
 {
     double result;
-    while ((result = distribution(generator)) >= 1.0)
+    do
     {
         // We are interested only in values [0-1), so another generation is
         // required in case such an unfitting number is produced.
+        result = distribution(generator);
     }
-
+    while (result >= 1.0);
     return result;
 }
 

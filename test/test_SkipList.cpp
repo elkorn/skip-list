@@ -21,7 +21,7 @@ int main(int argc, char **argv)
     cout << "*** BASIC API TESTS ***" << endl << "    ";
     theList->insert(testVal1);
     theList->insert(testVal2);
-    theList->find(testVal2); // removing this causes a segfault. No more?
+    assert(theList->find(testVal2)->getVal() == testVal2);
     assert(theList->find(9865) == theList->end() && "It should throw an exception when searching for a non-existent key.");
     theList->insert(testVal3);
     assert(emptyList->empty() == 1);

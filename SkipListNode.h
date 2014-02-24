@@ -11,7 +11,7 @@ struct SkipListNode {
         SkipListNode(int);
         SkipListNode(const SkipListNode&);
         ~SkipListNode();
- 
+
         bool valueEquals(const Val&);
 
         const Val& getVal();
