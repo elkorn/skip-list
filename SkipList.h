@@ -1,8 +1,6 @@
-#include "ExponentialRandomHeight.cpp"
 #include "SkipListNode.cpp"
 #include <vector>
 #include <utility>
-#include <list>
 
 template <class Val>
 class SkipList {
@@ -17,12 +15,11 @@ class SkipList {
         ~SkipList();
 
         std::pair<bool, iterator> insert(const Val&);
-        iterator erase(const Val&);
+        iterator erase(iterator);
         iterator find(const Val&);
         const bool empty();
         const unsigned int count(const Val&);
-        const unsigned int size();
-        const unsigned int& getCurrentHeight() const;
+        const unsigned int size() const;
         void clear();
         void swap(SkipList &other);
         SkipList& operator=(const SkipList& other);
@@ -34,11 +31,6 @@ class SkipList {
         iterator lower_bound(const Val& theVal);
         iterator upper_bound(const Val& theVal);
         std::pair<iterator, iterator> equal_range(const Val& theVal);
-        std::vector<int> bla;
-        std::list<SkipListNode<Val>> list;
-
-        void display();
-        void displvl(int l);
 
     private:
         SkipListNode<Val>* head;
@@ -47,7 +39,6 @@ class SkipList {
         unsigned int currentHeight;
         unsigned int _size;
         std::vector<SkipListNode<Val>*> toUpdate;
-        ExponentialRandomHeight *randomizer;
 
         bool isNodeMeaningful(SkipListNode<Val> *node);
         void removeMeaningfulNodes();

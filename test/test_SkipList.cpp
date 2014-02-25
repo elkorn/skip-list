@@ -1,5 +1,5 @@
-#include <assert.h>
-#include <string.h>
+#include <cassert>
+#include <cstring>
 #include <iostream>
 #include <utility>
 #include <time.h>
@@ -21,9 +21,12 @@ int main(int argc, char **argv)
     cout << "*** BASIC API TESTS ***" << endl << "    ";
     theList->insert(testVal1);
     theList->insert(testVal2);
+
     assert(theList->find(testVal2)->getVal() == testVal2);
     assert(theList->find(9865) == theList->end() && "It should throw an exception when searching for a non-existent key.");
+
     theList->insert(testVal3);
+
     assert(emptyList->empty() == 1);
     assert(theList->empty() == 0);
     assert(theList->size() == 3);
@@ -31,7 +34,11 @@ int main(int argc, char **argv)
     assert(theList->count(testVal2) == 1);
     assert(theList->count(123) == 0);
     assert(emptyList->count("etreu") == 0);
-    assert(theList->erase(testVal3) == theList->end());
+
+    SkipList<int>::iterator it1 = theList->begin();
+    while (it1->getVal() != testVal3) ++it1;
+
+    assert(theList->erase(it1) == theList->end());
     assert(theList->size() == 2 && "It should erase the 'b' element.");
     theList->insert(testVal3);
     std::pair<bool, SkipList<int>::iterator> insertionResult = theList->insert(testVal3);
@@ -73,15 +80,29 @@ int main(int argc, char **argv)
     cout << "*** BOUND-RELATED METHOD TESTS ***" << endl;
     cout << "    Lower bound" << endl << "    ";
 
+    it1 = theList->begin();
+    while (it1->getVal() != testVal2)
+    {
+        ++it1;
+    }
+
     assert(theList->lower_bound(testVal1)->getVal() == testVal1 && "The lower bound for an existing element should be the element itself.");
-    theList->erase(testVal2);
+    theList->erase(it1);
     assert(theList->lower_bound(testVal2)->getVal() == testVal3 && "The lower bound for a non-existing element should be the first element with a key that is not less than the given key.");
     assert(theList->lower_bound(8888) == theList->end() &&  "[FAIL] The lower bound for a non-existing element with a key greater than any key conatined within the set should not exist.");
 
     theList->insert(testVal2);
     cout << endl << "    Upper bound" << endl << "    ";
     assert(theList->upper_bound(testVal1)->getVal() == testVal2 && "The upper bound for an existing element should be the first element with a key greater than the given one.");
-    theList->erase(testVal2);
+
+    it1 = theList->begin();
+    while (it1->getVal() != testVal2)
+    {
+        ++it1;
+    }
+
+    theList->erase(it1);
+
     assert(theList->upper_bound(testVal2)->getVal() == testVal3 && "The upper bound for a non-existing element should be the first element with a key that is greater than the given key.");
     theList->insert(testVal2);
     assert(theList->upper_bound(testVal4) == theList->end() &&  "The upper bound for an existing element with a key greater than any key conatined within the set should not exist.");
@@ -101,7 +122,13 @@ int main(int argc, char **argv)
     assert(degenerate->insert(defaultVal).first == true && "It should be possible to insert an element with a key equal to the default value of given type.");
     assert(degenerate->size() == 1 && "The inserted element should be counted into the overall size of the structure.");
     assert(degenerate->find(defaultVal)->getVal() == defaultVal && "It should be possible to find an element placed under the key equal to the default value of given type.");
-    assert(degenerate->erase(defaultVal) == degenerate->end() && "It should be possible to erase an element placed under the key equal to the default value of given type.");
+    it1 = degenerate->begin();
+    while (it1->getVal() != defaultVal)
+    {
+        ++it1;
+    }
+
+    assert(degenerate->erase(it1) == degenerate->end() && "It should be possible to erase an element placed under the key equal to the default value of given type.");
     assert(degenerate->size() == 0);
     assert(degenerate->find(defaultVal) == degenerate->end() && "The erased element should not exist in the structure.");
 

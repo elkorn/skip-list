@@ -3,7 +3,7 @@
 #include <fstream>
 #include <stdexcept>
 #include "../SkipList.cpp"
-
+#include "../SkipListDisplayer.cpp"
 
 using namespace std;
 
@@ -12,7 +12,7 @@ int main()
     srand(time(0));
     const int nrolls = 20; // number of experiments
     // const double lambda = 3.5;
-    SkipList<int> *sl = new SkipList<int>();
+    SkipList<int> sl = SkipList<int>();
     ofstream of;
     of.open("results.csv");
 
@@ -21,15 +21,14 @@ int main()
     for (int i = 0; i < nrolls; ++i)
     {
         v[i] = i;
-        sl->insert(v[i]);
+        sl.insert(v[i]);
     }
 
-    sl->display();
-    SkipList<int>::iterator begin = sl->begin(),
-                            end = sl->end();
+    SkipListDisplayer::display(sl);
+    SkipList<int>::iterator begin = sl.begin(),
+                            end = sl.end();
 
 
-    delete sl;
     delete []v;
     return 0;
 }

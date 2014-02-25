@@ -2,3 +2,7 @@ tags
 *.out
 *.csv
 output
+.Rhistory
+ExponentialRandomHeight.*
+test_Randomizer.*
+*.TODO
