@@ -1,19 +1,11 @@
 #include <string.h>
-#include <set>
+#include <unordered_set>
 #include <iostream>
 #include <utility>
 #include <time.h>
 #include <fstream>
-#include "../SkipList.cpp"
 #include <sstream>
 #include <algorithm>
-
-// Testy:
-// wydajność - timing dla milionów: inty (random shuffled)
-//                                  słowa (random shuffled) - wykorzystać
-//                                                            słownik z lab
-// Porównanie jak w ZBP1 (unordered_set, set i skiplist)
-// Pomiar pamięci (program zawierający tylko strukturę z milionem słów)
 
 float sec(clock_t time)
 {
@@ -32,10 +24,10 @@ int main(int argc, char **argv)
     }
 
     ofstream inserting, erasing, finding, elements;
-    elements.open(dir.str() + "elements.csv");
-    inserting.open(dir.str() + "inserting.csv");
-    finding.open(dir.str() + "finding.csv");
-    erasing.open(dir.str() + "erasing.csv");
+    elements.open(dir.str() + "elements_uset.csv");
+    inserting.open(dir.str() + "inserting_uset.csv");
+    finding.open(dir.str() + "finding_uset.csv");
+    erasing.open(dir.str() + "erasing_uset.csv");
 
     clock_t start, t, total;
     const int MAX = 1000000;
@@ -49,7 +41,7 @@ int main(int argc, char **argv)
     for (int LIMIT = INCREMENT; LIMIT <= MAX; LIMIT += INCREMENT)
     {
         cout << "Procesing " << LIMIT << " elements..." << endl;
-        SkipList<int> theList = SkipList<int> ();
+        std::unordered_set<int> theList = std::unordered_set<int> ();
         elements << LIMIT << endl;
 
         cout << "\tInsert" << endl;
@@ -78,9 +70,8 @@ int main(int argc, char **argv)
         t = 0;
         for (int i = 0; i < LIMIT; ++i)
         {
-            SkipList<int>::iterator it = theList.begin();
             start = clock();
-            theList.erase(it);
+            theList.erase(values[i]);
             t += clock() - start;
         }
 

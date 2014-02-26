@@ -229,7 +229,8 @@ typename SkipList<Val>::iterator SkipList<Val>::erase(SkipList<Val>::iterator po
     // Get the found node at the base level.
     tempNode = tempNode->next.at(0);
 
-    if (tempNode->valueEquals(pos->getVal()))
+    if (isNodeMeaningful(tempNode) &&
+            tempNode->valueEquals(pos->getVal()))
     {
         for (int i = 0; i < currentHeight; ++i)
         {
@@ -354,7 +355,8 @@ void SkipList<Val>::clear()
 }
 
 template <class Val>
-void SkipList<Val>::swap(SkipList& other) {
+void SkipList<Val>::swap(SkipList &other)
+{
     SkipListNode<Val> *temp = other.head;
     std::vector<SkipListNode<Val> *> tempToUpdate = other.toUpdate;
     int tempMaxHeight = other.maxHeight;
@@ -378,7 +380,8 @@ void SkipList<Val>::swap(SkipList& other) {
 }
 
 template <class Val>
-SkipList<Val>& SkipList<Val>::operator=(const SkipList& other) {
+SkipList<Val> &SkipList<Val>::operator=(const SkipList &other)
+{
     clear();
     insertRange(SkipList<Val>::iterator(other.head->next.at(0)), SkipList<Val>::iterator(other.tail));
 }

@@ -1,8 +1,8 @@
-setwd("/home/helluin/Documents/Git/skip-list/results/O3");
-elements <- read.table("./elements.csv", header=FALSE, sep="\n")[,"V1"];
-insert <- read.table("./inserting.csv", header=FALSE, sep="\n")[,"V1"];
-find <- read.table("./finding.csv", header=FALSE, sep="\n")[,"V1"];
-erase <- read.table("./erasing.csv", header=FALSE, sep="\n")[,"V1"];
+setwd("/home/helluin/Documents/Git/skip-list/results");
+elements <- read.table("./elements_set.csv", header=FALSE, sep="\n")[,"V1"];
+insert <- read.table("./inserting_set.csv", header=FALSE, sep="\n")[,"V1"];
+find <- read.table("./finding_set.csv", header=FALSE, sep="\n")[,"V1"];
+erase <- read.table("./erasing_set.csv", header=FALSE, sep="\n")[,"V1"];
 col1="blue";
 col2="red";
 col3="orange";

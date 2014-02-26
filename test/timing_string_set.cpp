@@ -1,23 +1,31 @@
 #include <string.h>
-#include <set>
 #include <iostream>
 #include <utility>
 #include <time.h>
 #include <fstream>
-#include "../SkipList.cpp"
 #include <sstream>
 #include <algorithm>
+#include <set>
+#include <list>
+#include <vector>
+#include <iterator>
+#include <sstream>
 
-// Testy:
-// wydajność - timing dla milionów: inty (random shuffled)
-//                                  słowa (random shuffled) - wykorzystać
-//                                                            słownik z lab
-// Porównanie jak w ZBP1 (unordered_set, set i skiplist)
-// Pomiar pamięci (program zawierający tylko strukturę z milionem słów)
-
+using namespace std;
 float sec(clock_t time)
 {
     return (float)time / CLOCKS_PER_SEC;
+}
+
+vector<string> readData(const char* path)
+{
+    const vector<string> dest();
+        ifstream input(path);
+    stringstream str;
+    copy(istreambuf_iterator<char>(input),
+        istreambuf_iterator<char>(),
+        ostreambuf_iterator<char>(str));
+    return vector<string>(istream_iterator<string>(str), istream_iterator<string>());
 }
 
 using namespace std;
@@ -32,24 +40,23 @@ int main(int argc, char **argv)
     }
 
     ofstream inserting, erasing, finding, elements;
-    elements.open(dir.str() + "elements.csv");
-    inserting.open(dir.str() + "inserting.csv");
-    finding.open(dir.str() + "finding.csv");
-    erasing.open(dir.str() + "erasing.csv");
+    elements.open(dir.str() + "string_elements.csv");
+    inserting.open(dir.str() + "string_inserting.csv");
+    finding.open(dir.str() + "string_finding.csv");
+    erasing.open(dir.str() + "string_erasing.csv");
 
     clock_t start, t, total;
-    const int MAX = 1000000;
-    const int INCREMENT = 10000;
-    std::vector<int> values(MAX);
+    std::vector<string> values = readData("lab1.dic");
+    int MAX = values.size();
+    const int INCREMENT = 1000;
 
-    for (int i = 0; i < MAX; ++i) values.push_back(i);
     std::random_shuffle(values.begin(), values.end());
 
     total = clock();
-    for (int LIMIT = INCREMENT; LIMIT <= MAX; LIMIT += INCREMENT)
+    for (int LIMIT = INCREMENT; LIMIT < MAX; LIMIT += INCREMENT)
     {
         cout << "Procesing " << LIMIT << " elements..." << endl;
-        SkipList<int> theList = SkipList<int> ();
+        set<string> theList = set<string> ();
         elements << LIMIT << endl;
 
         cout << "\tInsert" << endl;
@@ -78,7 +85,7 @@ int main(int argc, char **argv)
         t = 0;
         for (int i = 0; i < LIMIT; ++i)
         {
-            SkipList<int>::iterator it = theList.begin();
+            set<string>::iterator it = theList.begin();
             start = clock();
             theList.erase(it);
             t += clock() - start;
